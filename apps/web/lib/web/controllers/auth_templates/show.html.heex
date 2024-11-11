@@ -1,0 +1,6 @@
+<%= if @user do %>
+  <h2>User: <%= @user.name %></h2>
+  <h2>Email: <%= @user.email %></h2>
+<% else %>
+  <.header><%= Web.Messages.user_not_logged_in() %></.header>
+<% end %>

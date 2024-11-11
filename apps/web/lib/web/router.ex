@@ -18,6 +18,13 @@ defmodule Web.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    get "/register", AuthController, :register_page
+    post "/register", AuthController, :register
+    get "/login", AuthController, :login_page
+    post "/login", AuthController, :login
+    post "/logout", AuthController, :logout
+    get "/showMe", AuthController, :show
   end
 
   # Other scopes may use custom stacks.

@@ -1,0 +1,23 @@
+<section class="bg-blue-500 text-white py-12">
+  <div class="container mx-auto px-6 text-center">
+    <h1 class="text-4xl font-bold mb-4">Create your account</h1>
+    <p class="text-lg mb-6">
+      Join us to unlock amazing gaming experience and become part of a growing community.
+    </p>
+    <p class="text-sm">
+      Already have an account? <a href="/login" class="text-yellow-200 hover:underline">Log in here</a>.
+    </p>
+  </div>
+</section>
+
+<div class="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+  <.simple_form :let={f} for={@changeset} action={~p"/register"}>
+    <.input placeholder="used to login into the game" field={f[:login]} label="Login:" />
+    <.input placeholder="visible by other players in the game" field={f[:name]} label="Username:" />
+    <.input type="email" field={f[:email]} label="Email:" />
+    <.input field={f[:password]} type="password" label="Password:" />
+    <:actions>
+      <.button>Register</.button>
+    </:actions>
+  </.simple_form>
+</div>
