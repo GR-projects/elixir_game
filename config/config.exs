@@ -10,8 +10,16 @@
 import Config
 
 config :web,
-  ecto_repos: [Web.Repo],
   generators: [context_app: false]
+
+config :data, Data.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "elixir_game_dev",
+  hostname: "localhost",
+  pool_size: 10
+
+config :data, :ecto_repos, [Data.Repo]
 
 # Configures the endpoint
 config :web, Web.Endpoint,

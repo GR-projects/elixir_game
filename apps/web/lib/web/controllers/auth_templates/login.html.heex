@@ -1,0 +1,19 @@
+<section class="bg-gray-800 text-white py-12">
+  <div class="container mx-auto px-6 text-center">
+    <h1 class="text-4xl font-bold mb-4">Welcome Back!</h1>
+    <p class="text-lg mb-6">Log in to access your account and continue where you left off.</p>
+    <p class="text-sm">
+      New here? <a href="/register" class="text-blue-400 hover:underline">Create an account</a>.
+    </p>
+  </div>
+</section>
+
+<div class="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+  <.simple_form :let={f} for={@changeset} action={~p"/login"}>
+    <.input field={f[:login]} label="Login:" />
+    <.input field={f[:password]} type="password" label="Password:" />
+    <:actions>
+      <.button>Log in</.button>
+    </:actions>
+  </.simple_form>
+</div>
