@@ -7,11 +7,11 @@ defmodule Web.PageController do
     render(conn, :home, layout: false)
   end
 
-  def login(conn, _params) do
-    render(conn, :login, layout: false)
-  end
+  def main(conn, _params) do
+    user = get_session(conn, :user)
 
-  def register(conn, _params) do
-    render(conn, :register, layout: false)
+    conn
+    |> assign(:user, user)
+    |> render(:main)
   end
 end

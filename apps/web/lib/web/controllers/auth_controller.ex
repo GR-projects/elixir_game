@@ -8,7 +8,7 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_registration_success())
-        |> redirect(to: ~p"/showMe")
+        |> redirect(to: ~p"/main")
 
       {:error, _error} ->
         conn
@@ -35,14 +35,14 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_login_success())
-        |> redirect(to: ~p"/showMe")
+        |> redirect(to: ~p"/main")
 
       {:error, _} ->
         changeset = BusinessLogic.user_changeset()
 
         conn
         |> put_flash(:error, Messages.user_login_failure())
-        |> render(:login, changeset: changeset)
+        |> render(:login, layout: false, changeset: changeset)
     end
   end
 
@@ -50,19 +50,24 @@ defmodule Web.AuthController do
     case get_session(conn, :user) do
       nil ->
         changeset = BusinessLogic.user_changeset()
-        render(conn, :login, changeset: changeset)
+        render(conn, :login, layout: false, changeset: changeset)
 
       _user ->
-        redirect(conn, to: ~p"/showMe")
+        redirect(conn, to: ~p"/main")
     end
   end
 
   def show(conn, _params) do
-    user = get_session(conn, :user)
+    case get_session(conn, :user) do
+      nil ->
+        changeset = BusinessLogic.user_changeset()
+        render(conn, :login, layout: false, changeset: changeset)
 
-    conn
-    |> assign(:user, user)
-    |> render(:show)
+      user ->
+        conn
+        |> assign(:user, user)
+        |> render(:show)
+    end
   end
 
   def register_page(conn, _params) do
@@ -72,7 +77,7 @@ defmodule Web.AuthController do
         render(conn, :register, layout: false, changeset: changeset)
 
       _user ->
-        redirect(conn, to: ~p"/showMe")
+        redirect(conn, to: ~p"/main")
     end
   end
 end

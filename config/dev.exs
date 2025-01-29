@@ -54,3 +54,5 @@ config :web, Web.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :web, dev_routes: true
+
+import_config "dev.secret.exs"
