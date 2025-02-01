@@ -8,10 +8,15 @@ defmodule Web.PageController do
   end
 
   def main(conn, _params) do
-    user = get_session(conn, :user)
+    case get_session(conn, :user) do
+      nil ->
+        changeset = BusinessLogic.user_changeset()
+        render(conn, :login, layout: false, changeset: changeset)
 
-    conn
-    |> assign(:user, user)
-    |> render(:main)
+      user ->
+        conn
+        |> assign(:user, user)
+        |> render(:main)
+    end
   end
 end

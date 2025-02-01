@@ -25,7 +25,7 @@ defmodule Web.AuthController do
       _user ->
         conn
         |> delete_session(:user)
-        |> redirect(to: ~p"/")
+        |> redirect(to: ~p"/login")
     end
   end
 
