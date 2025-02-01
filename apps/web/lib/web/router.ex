@@ -14,17 +14,27 @@ defmodule Web.Router do
     plug :accepts, ["json"]
   end
 
+  # here we can have additional scope, just for authenticated users, like in example:
+  # pipeline :auth do
+  #   plug :ensure_authenticated
+  # end
+
+  # scope "/" do
+  #   pipe_through [:browser, :auth]
+
+  #   get "/posts/new", PostController, :new
+  #   post "/posts", PostController, :create
+  # end
   scope "/", Web do
     pipe_through :browser
-
     get "/", PageController, :home
-
     get "/register", AuthController, :register_page
     post "/register", AuthController, :register
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
     post "/logout", AuthController, :logout
     get "/showMe", AuthController, :show
+    get "/main", PageController, :main
   end
 
   # Other scopes may use custom stacks.
