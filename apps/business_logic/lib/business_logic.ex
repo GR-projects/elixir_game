@@ -22,4 +22,8 @@ defmodule BusinessLogic do
       false -> {:error, :authentication_failed}
     end
   end
+
+  @spec get_user_items(Data.User.t()) :: [map()]
+  def get_user_items(user) do
+  end
 end

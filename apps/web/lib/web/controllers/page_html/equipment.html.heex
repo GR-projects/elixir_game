@@ -1,0 +1,11 @@
+<div class="equipment-container">
+  <h2>Your Equipment</h2>
+  <ul>
+    <%= for item <- @equipment do %>
+      <li class="equipment-item">
+        <%= "#{item}" %> # <strong><%= item.name %></strong>
+        # (<%= item.type %>) - <span class="stats">+<%= item.stats %> stats</span>
+      </li>
+    <% end %>
+  </ul>
+</div>

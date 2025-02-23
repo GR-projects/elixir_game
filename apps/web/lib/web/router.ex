@@ -35,6 +35,7 @@ defmodule Web.Router do
     post "/logout", AuthController, :logout
     get "/showMe", AuthController, :show
     get "/main", PageController, :main
+    get "/equipment", PageController, :equipment
   end
 
   # Other scopes may use custom stacks.
