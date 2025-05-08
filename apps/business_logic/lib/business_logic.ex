@@ -4,6 +4,7 @@ defmodule BusinessLogic do
   """
 
   defdelegate user_changeset(params \\ %{}), to: Data.User, as: :changeset
+  defdelegate character_changeset(params \\ %{}), to: Data.Character, as: :changeset
 
   def create_user(%{"password" => password} = params) do
     hashed_password = Bcrypt.hash_pwd_salt(password)
@@ -21,5 +22,13 @@ defmodule BusinessLogic do
       nil -> {:error, :user_not_exists}
       false -> {:error, :authentication_failed}
     end
+  end
+
+  def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do
+    params
+    |> Map.put("level", 1)
+    |> Map.put("experience", 0)
+    |> Map.put("user_id", user_id)
+    |> Data.create_character()
   end
 end
