@@ -31,4 +31,12 @@ defmodule BusinessLogic do
     |> Map.put("user_id", user_id)
     |> Data.create_character()
   end
+
+  def get_character(id) do
+    Data.get_character(id)
+  end
+
+  def delete_character(id) do
+    Data.delete_character(id)
+  end
 end

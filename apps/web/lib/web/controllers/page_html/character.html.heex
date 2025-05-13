@@ -8,19 +8,10 @@
   <% end %>
 <% else %>
   <p>User has no characters</p>
-  <p>Add your character</p>
-
-  <.form :let={f} for={@changeset} id="example-form" action={~p"/character"}>
-    <.input
-      field={f[:type]}
-      type="select"
-      label="Character type"
-      options={["Paladin", "Barbarian", "Wizard", "Druid", "Necromancer"]}
-      prompt="Select character type"
-    />
-
-    <.input field={f[:name]} type="text" label="Character name" />
-
-    <.button>Submit</.button>
-  </.form>
 <% end %>
+
+
+
+<.link navigate={~p"/character/new"} class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+  Add new character
+</.link>

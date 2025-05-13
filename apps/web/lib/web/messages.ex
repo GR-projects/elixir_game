@@ -6,4 +6,6 @@ defmodule Web.Messages do
   def user_login_success, do: "User logged in."
   def user_login_failure, do: "Cannot log in user. Try again"
   def character_create_failure, do: "Couldnt create character. Try again"
+  def character_get_failure, do: "Couldnt get character"
+  def character_delete_failure, do: "Couldnt delete character"
 end
