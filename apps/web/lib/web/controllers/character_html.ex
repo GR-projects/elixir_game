@@ -6,6 +6,5 @@ defmodule Web.CharacterHTML do
   """
   use Web, :html
 
-  embed_templates "auth_templates/*"
   embed_templates "page_html/*"
 end

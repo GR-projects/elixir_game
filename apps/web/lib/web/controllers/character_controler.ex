@@ -62,11 +62,9 @@ defmodule Web.CharacterController do
       user ->
         case BusinessLogic.get_character(id) do
           {:ok, character} ->
-            changeset = BusinessLogic.character_changeset()
-
             conn
             |> assign(:user, user)
-            |> render(:character, changeset: changeset)
+            |> render(:show, character: character)
 
           {:error, _error} ->
             conn
