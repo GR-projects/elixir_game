@@ -9,6 +9,7 @@ defmodule Data.User do
     field(:email, :string)
     field(:password_hash, :string)
     field(:login, :string)
+    has_many(:characters, Data.Character)
 
     # Automatically adds inserted_at and updated_at
     timestamps()
