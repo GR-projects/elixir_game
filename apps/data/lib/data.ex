@@ -19,6 +19,7 @@ defmodule Data do
   @spec get_user(String.t()) :: User.t()
   def get_user(login) do
     Repo.get_by(User, login: login)
+    |> Repo.preload(:characters)
   end
 
   @spec get_character_items(Character.t()) :: [map()]

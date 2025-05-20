@@ -8,7 +8,7 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_registration_success())
-        |> redirect(to: ~p"/main")
+        |> redirect(to: ~p"/")
 
       {:error, _error} ->
         conn
@@ -18,15 +18,9 @@ defmodule Web.AuthController do
   end
 
   def logout(conn, _params) do
-    case get_session(conn, :user) do
-      nil ->
-        redirect(conn, to: ~p"/")
-
-      _user ->
-        conn
-        |> delete_session(:user)
-        |> redirect(to: ~p"/login")
-    end
+    conn
+    |> delete_session(:user)
+    |> redirect(to: ~p"/login")
   end
 
   def login(conn, %{"user" => params}) do
@@ -35,7 +29,7 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_login_success())
-        |> redirect(to: ~p"/main")
+        |> redirect(to: ~p"/")
 
       {:error, _} ->
         changeset = BusinessLogic.user_changeset()
@@ -47,27 +41,12 @@ defmodule Web.AuthController do
   end
 
   def login_page(conn, _params) do
-    case get_session(conn, :user) do
-      nil ->
-        changeset = BusinessLogic.user_changeset()
-        render(conn, :login, layout: false, changeset: changeset)
-
-      _user ->
-        redirect(conn, to: ~p"/main")
-    end
+    changeset = BusinessLogic.user_changeset()
+    render(conn, :login, layout: false, changeset: changeset)
   end
 
   def show(conn, _params) do
-    case get_session(conn, :user) do
-      nil ->
-        changeset = BusinessLogic.user_changeset()
-        render(conn, :login, layout: false, changeset: changeset)
-
-      user ->
-        conn
-        |> assign(:user, user)
-        |> render(:show)
-    end
+    render(conn, :show)
   end
 
   def register_page(conn, _params) do
@@ -77,7 +56,7 @@ defmodule Web.AuthController do
         render(conn, :register, layout: false, changeset: changeset)
 
       _user ->
-        redirect(conn, to: ~p"/main")
+        redirect(conn, to: ~p"/")
     end
   end
 end

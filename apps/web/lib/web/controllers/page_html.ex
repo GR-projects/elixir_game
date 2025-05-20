@@ -7,5 +7,4 @@ defmodule Web.PageHTML do
   use Web, :html
 
   embed_templates "page_html/*"
-  embed_templates "auth_templates/*"
 end

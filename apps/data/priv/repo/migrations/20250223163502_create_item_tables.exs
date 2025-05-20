@@ -3,6 +3,7 @@ defmodule Data.Repo.Migrations.CreateItemTables do
 
   def change do
     create table(:characters) do
+      add(:user_id, :integer, references: :users)
     end
 
     create table(:item_stats) do
@@ -21,6 +22,9 @@ defmodule Data.Repo.Migrations.CreateItemTables do
     create table(:items) do
       add(:name, :string)
       add(:type, :string)
+      add(:position, :string)
+      add(:sprite, :string)
+      add(:equipped?, :boolean)
       add(:character_id, :integer, references: :characters)
 
       timestamps()

@@ -1,19 +1,7 @@
 defmodule Web.PageController do
   use Web, :controller
 
-  defmacrop with_user_logged_in(conn, do: do_block) do
-    quote do
-      case get_user(unquote(conn)) do
-        nil ->
-          changeset = BusinessLogic.user_changeset()
-          render(unquote(conn), :login, layout: false, changeset: changeset)
-
-        user ->
-          unquote(do_block)
-          |> assign(:user, user)
-      end
-    end
-  end
+  alias Web.Helpers
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -22,24 +10,26 @@ defmodule Web.PageController do
   end
 
   def main(conn, _params) do
-    with_user_logged_in(conn) do
-      render(conn, :main)
-    end
+    render(conn, :main)
   end
 
   def equipment(conn, _params) do
-    with_user_logged_in(conn) do
-      user = get_user(conn)
+    items =
+      conn
+      |> Helpers.get_user()
+      |> Map.get(:characters)
+      # |> List.first()
+      |> Enum.map(&Data.get_character_items(&1))
+      |> List.flatten()
 
-      eq = [
-        %{name: "Sword +0", type: :sword, stats: "3 ATT 0 DEF"}
-      ]
+    # |> Data.get_character_items()
 
-      render(conn, :equipment, equipment: eq)
-    end
-  end
+    dbg(items)
 
-  defp get_user(conn) do
-    get_session(conn, :user)
+    # eq = [
+    #   %{name: "Sword +0", type: :sword, stats: "3 ATT 0 DEF"}
+    # ]
+
+    render(conn, :equipment, equipment: items)
   end
 end

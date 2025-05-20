@@ -1,11 +1,73 @@
 <div class="equipment-container">
   <h2>Your Equipment</h2>
+
   <ul>
     <%= for item <- @equipment do %>
       <li class="equipment-item">
-        <%= "#{item}" %> # <strong><%= item.name %></strong>
-        # (<%= item.type %>) - <span class="stats">+<%= item.stats %> stats</span>
+        <%= "#{item.name} (#{item.position})" %>
       </li>
     <% end %>
   </ul>
+
+  <div class="flex justify-center space-x-8">
+    <!-- Equipped Items -->
+    <div class="max-w-xs grid grid-cols-3 gap-4 p-4 bg-gray-800 text-white rounded-lg auto-rows-min">
+      <!-- Helmet (Head) -->
+      <div class="col-span-3 flex justify-center relative group">
+        <Web.Components.Equipment.render_slot item={
+          Enum.find(@equipment, &(&1.position == :head and &1.equipped?))
+        } />
+      </div>
+      <!-- Right Hand -->
+      <div class="flex justify-center relative group">
+        <Web.Components.Equipment.render_slot item={
+          Enum.find(@equipment, &(&1.position == :right_hand and &1.equipped?))
+        } />
+      </div>
+      <!-- Armor (Chest) -->
+      <div class="flex justify-center relative group">
+        <Web.Components.Equipment.render_slot item={
+          Enum.find(@equipment, &(&1.position == :chest and &1.equipped?))
+        } />
+      </div>
+      <!-- Left Hand -->
+      <div class="flex justify-center relative group">
+        <Web.Components.Equipment.render_slot item={
+          Enum.find(@equipment, &(&1.position == :left_hand and &1.equipped?))
+        } />
+      </div>
+      <!-- Boots (Legs) -->
+      <div class="col-span-3 flex justify-center relative group">
+        <Web.Components.Equipment.render_slot item={
+          Enum.find(@equipment, &(&1.position == :legs and &1.equipped?))
+        } />
+      </div>
+    </div>
+    <!-- Inventory Items -->
+    <div class="max-w-xs grid grid-cols-4 gap-4 p-4 bg-gray-800 text-white rounded-lg">
+      <h2 class="col-span-4 text-center text-lg font-bold">Inventory</h2>
+
+      <%= for {item, index} <- Enum.with_index(Enum.take(Enum.filter(@equipment, &(!&1.equipped?)) ++ List.duplicate(nil, 30), 30)) do %>
+        <div
+          class="w-16 h-16 border-2 border-gray-600 flex items-center justify-center bg-gray-700 rounded-lg relative group"
+          title={if item, do: item.name, else: "Empty Slot"}
+        >
+          <%= if item do %>
+            <img
+              src="/images/inventory_item.png"
+              alt={item.name}
+              class="w-full h-full object-contain"
+            />
+            <div class="absolute bottom-0 left-0 w-full bg-black bg-opacity-75 text-xs text-white text-center p-1 hidden group-hover:block">
+              <%= "HP: #{item.stats.health}, Att: #{item.stats.physical_att}/#{item.stats.magical_att}, Def: #{item.stats.physical_def}/#{item.stats.magical_def}" %>
+            </div>
+          <% end %>
+
+          <span class="absolute top-1 right-1 text-xs text-gray-500">
+            <%= index + 1 %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

@@ -14,6 +14,37 @@ defmodule Web.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug :ensure_authorized
+  end
+
+  pipeline :unauth do
+    plug :ensure_unauthorized
+  end
+
+  defp ensure_authorized(conn, _opts) do
+    case get_session(conn, :user) do
+      nil ->
+        redirect(conn, to: "/login")
+
+      user ->
+        conn
+        |> assign(:user, user)
+    end
+  end
+
+  defp ensure_unauthorized(conn, _opts) do
+    case get_session(conn, :user) do
+      nil ->
+        conn
+
+      user ->
+        conn
+        |> assign(:user, user)
+        |> redirect(to: "/")
+    end
+  end
+
   # here we can have additional scope, just for authenticated users, like in example:
   # pipeline :auth do
   #   plug :ensure_authenticated
@@ -26,16 +57,19 @@ defmodule Web.Router do
   #   post "/posts", PostController, :create
   # end
   scope "/", Web do
-    pipe_through :browser
-    get "/", PageController, :home
-    get "/register", AuthController, :register_page
+    pipe_through [:browser, :auth]
+    get "/showMe", AuthController, :show
+    get "/", PageController, :main
+    get "/equipment", PageController, :equipment
+    post "/logout", AuthController, :logout
+  end
+
+  scope "/", Web do
+    pipe_through [:browser, :unauth]
     post "/register", AuthController, :register
+    get "/register", AuthController, :register_page
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
-    post "/logout", AuthController, :logout
-    get "/showMe", AuthController, :show
-    get "/main", PageController, :main
-    get "/equipment", PageController, :equipment
   end
 
   # Other scopes may use custom stacks.

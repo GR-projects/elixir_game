@@ -6,6 +6,9 @@ defmodule Data.Item do
   schema "items" do
     field(:name, :string)
     field(:type, Ecto.Enum, values: [:sword, :bow, :staff])
+    field(:position, Ecto.Enum, values: [:head, :left_hand, :right_hand, :two_hands, :legs])
+    field(:sprite, :string)
+    field(:equipped?, :boolean)
     has_one(:stats, Data.ItemStats)
     belongs_to(:character, Data.Character)
 
