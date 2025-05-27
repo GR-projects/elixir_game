@@ -91,7 +91,9 @@ defmodule Web.CharacterController do
       user ->
         case BusinessLogic.delete_character(id) do
           {:ok, character} ->
-            character
+            conn
+            |> assign(:user, user)
+            |> redirect(to: ~p"/character")
 
           {:error, _error} ->
             conn

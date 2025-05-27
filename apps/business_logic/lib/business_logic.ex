@@ -24,6 +24,10 @@ defmodule BusinessLogic do
     end
   end
 
+  @spec get_user_items(Data.User.t()) :: [map()]
+  def get_user_items(user) do
+  end
+
   def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do
     params
     |> Map.put("level", 1)
