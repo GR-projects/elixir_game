@@ -7,11 +7,6 @@ defmodule Utils.ETS do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  # Create a new ETS table with given name and options
-  def create_table(table_name, opts \\ [:named_table, :set, :public]) do
-    GenServer.call(__MODULE__, {:create_table, table_name, opts})
-  end
-
   # Insert a tuple into a specific ETS table
   def insert(table_name, tuple) do
     GenServer.call(__MODULE__, {:insert, table_name, tuple})
@@ -41,16 +36,6 @@ defmodule Utils.ETS do
   end
 
   @impl true
-  def handle_call({:create_table, table_name, opts}, _from, state) do
-    case Map.get(state, table_name) do
-      nil ->
-        tid = :ets.new(table_name, opts)
-        {:reply, {:ok, tid}, Map.put(state, table_name, tid)}
-      _ ->
-        {:reply, {:error, :table_already_exists}, state}
-    end
-  end
-
   def handle_call({:insert, table_name, tuple}, _from, state) do
     case Map.fetch(state, table_name) do
       {:ok, tid} ->
