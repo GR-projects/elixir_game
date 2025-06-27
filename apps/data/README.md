@@ -1,6 +1,6 @@
 # Data
 
-**TODO: Add description**
+This app handles data persistence, Ecto schemas, and database access for the umbrella project.
 
 ## Installation
 

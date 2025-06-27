@@ -1,6 +1,6 @@
 # BusinessLogic
 
-**TODO: Add description**
+This app contains the core business logic and domain rules for the umbrella project.
 
 ## Installation
 

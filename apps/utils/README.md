@@ -1,6 +1,6 @@
 # Utils
 
-**TODO: Add description**
+This app provides utility modules, including ETS-based caching, for the umbrella project.
 
 ## Installation
 
