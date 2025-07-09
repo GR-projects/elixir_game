@@ -25,7 +25,19 @@ defmodule BusinessLogic do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user) do
+  def get_user_items(user = %{login: login}) do
+    case Utils.ETS.lookup(:users, login) do
+      {:ok, cached_user} ->
+        cached_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+      {:error, :not_found} ->
+        ets_user = user |> Data.Repo.preload(characters: :items)
+        Utils.ETS.insert(:users, {login, ets_user})
+        ets_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+    end
   end
 
   def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do

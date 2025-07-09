@@ -3,6 +3,7 @@ defmodule Data do
   alias Data.Repo
   alias Data.User
   alias Data.Character
+  alias Utils.ETS
 
   import Ecto.Query
 
@@ -18,14 +19,20 @@ defmodule Data do
 
   @spec get_user(String.t()) :: User.t()
   def get_user(login) do
-    user = Repo.get_by(User, login: login)
+    case ETS.lookup(:users, login) do
+      {:ok, user} ->
+        user
+      {:error, :not_found} ->
+        user = Repo.get_by(User, login: login)
 
-    if user do
-      ets_user = user |> Repo.preload(:characters)
-      Utils.ETS.insert(:users, {login, ets_user})
+        case user do
+          nil -> nil
+          user ->
+            ets_user = user |> Repo.preload(characters: :items)
+            ETS.insert(:users, {login, ets_user})
+            user
+        end
     end
-
-    user
   end
 
   @spec get_character_items(Character.t()) :: [map()]
@@ -48,10 +55,15 @@ defmodule Data do
     end
   end
 
-  def get_user_characters(_user = %{id: user_id}) do
-    Character.base_query()
-    |> where([{^Character.binding_name(), c}], c.user_id == ^user_id)
-    |> Repo.all()
+  def get_user_characters(user = %{login: login}) do
+    case ETS.lookup(:users, login) do
+      {:ok, %{characters: characters}} ->
+        characters
+      {:error, :not_found} ->
+        ets_user = user |> Repo.preload(characters: :items)
+        ETS.insert(:users, {login, ets_user})
+        ets_user.characters
+    end
   end
 
   @spec create_character(map()) :: {:ok, Character.t()} | {:error, list()}

@@ -1,5 +1,6 @@
 defmodule Data.Character do
   alias Data.User
+  alias Data.Item
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
@@ -12,6 +13,7 @@ defmodule Data.Character do
     field(:level, :integer)
     field(:experience, :float)
     belongs_to(:user, User)
+    has_many(:items, Item)
 
     # Automatically adds inserted_at and updated_at
     timestamps()

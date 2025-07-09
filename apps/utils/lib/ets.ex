@@ -1,79 +1,49 @@
 defmodule Utils.ETS do
-  use GenServer
+  @moduledoc """
+  Utility module for ETS (Erlang Term Storage) operations.
+  Provides a simplified interface for common ETS operations.
+  """
 
-  # Client API
-
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
-  end
-
-  # Insert a tuple into a specific ETS table
-  def insert(table_name, tuple) do
-    GenServer.call(__MODULE__, {:insert, table_name, tuple})
-  end
-
-  # Lookup key in a specific ETS table
-  def lookup(table_name, key) do
-    GenServer.call(__MODULE__, {:lookup, table_name, key})
-  end
-
-  # Delete a key from a specific ETS table
-  def delete(table_name, key) do
-    GenServer.call(__MODULE__, {:delete, table_name, key})
-  end
-
-  # Server Callbacks
-
-  @impl true
-  def init(_) do
-    # State: Map of table_name => ets_table_ref
-    tables = Application.get_env(:utils, Utils.ETS)[:tables]
-    state = Enum.reduce(tables, %{}, fn table_name, acc ->
-      tid = :ets.new(table_name, [:named_table, :set, :public])
-      Map.put(acc, table_name, tid)
+  @doc """
+  Initializes ETS tables based on configuration.
+  Creates named, public tables with read and write concurrency enabled.
+  """
+  @spec init([atom()] | nil) :: :ok
+  def init(tables \\ nil) do
+    tables = tables || Application.get_env(:utils, Utils.ETS)[:tables] || []
+    |> dbg()
+    Enum.each(tables, fn table_name ->
+      :ets.new(table_name, [:named_table, :set, :public, read_concurrency: true, write_concurrency: true])
     end)
-    {:ok, state}
   end
 
-  @impl true
-  def handle_call({:insert, table_name, tuple}, _from, state) do
-    case Map.fetch(state, table_name) do
-      {:ok, tid} ->
-        :ets.insert(tid, tuple)
-        {:reply, :ok, state}
+  @doc """
+  Inserts a tuple into the specified ETS table.
+  """
+  @spec insert(atom(), tuple()) :: true
+  def insert(table_name, tuple) do
+    :ets.insert(table_name, tuple)
+  end
 
-      :error ->
-        {:reply, {:error, :table_not_found}, state}
+  @doc """
+  Looks up a key in the specified ETS table.
+  Returns {:ok, value} if found, {:error, :not_found} otherwise.
+  """
+  @spec lookup(atom(), term()) :: {:ok, term()} | {:error, :not_found}
+  def lookup(table_name, key) do
+    case :ets.lookup(table_name, key) do
+      [{_key, value}] ->
+        {:ok, value}
+      [] ->
+        {:error, :not_found}
     end
   end
 
-  def handle_call({:lookup, table_name, key}, _from, state) do
-    result =
-      case Map.fetch(state, table_name) do
-        {:ok, tid} ->
-          case :ets.lookup(tid, key) do
-            [{_key, value}] ->
-              {:ok, value}
-            [] ->
-              {:error, :not_found}
-          end
-        :error ->
-          {:error, :table_not_found}
-      end
-
-    {:reply, result, state}
-  end
-
-  def handle_call({:delete, table_name, key}, _from, state) do
-    result = case Map.fetch(state, table_name) do
-      {:ok, tid} ->
-        :ets.delete(tid, key)
-        :ok
-
-      :error ->
-        {:error, :table_not_found}
-    end
-
-    {:reply, result, state}
+  @doc """
+  Deletes a key from the specified ETS table.
+  """
+  @spec delete(atom(), term()) :: true
+  def delete(table_name, key) do
+    :ets.delete(table_name, key)
   end
 end

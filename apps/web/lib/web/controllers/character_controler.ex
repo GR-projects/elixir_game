@@ -40,7 +40,7 @@ defmodule Web.CharacterController do
 
       user ->
         case BusinessLogic.create_character(user, params) do
-          {:ok, character} ->
+          {:ok, _character} ->
             conn
             |> redirect(to: ~p"/character")
 
@@ -90,7 +90,7 @@ defmodule Web.CharacterController do
 
       user ->
         case BusinessLogic.delete_character(id) do
-          {:ok, character} ->
+          {:ok, _character} ->
             conn
             |> assign(:user, user)
             |> redirect(to: ~p"/character")
