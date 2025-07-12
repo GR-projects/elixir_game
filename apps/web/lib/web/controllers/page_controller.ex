@@ -1,7 +1,7 @@
 defmodule Web.PageController do
   use Web, :controller
 
-  alias Web.Helpers
+  alias Utils.ETS
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -14,13 +14,27 @@ defmodule Web.PageController do
   end
 
   def equipment(conn, _params) do
-    items =
-      conn
-      |> Helpers.get_user()
-      |> Map.get(:characters)
-      # |> List.first()
-      |> Enum.map(&Data.get_character_items(&1))
-      |> List.flatten()
+    items = BusinessLogic.get_user_items(conn.assigns.user)
+      # :users
+      # |> ETS.lookup(conn.assigns.user.login)
+      # |> dbg()
+      # |> case do
+      #   {:ok, user} ->
+      #     user
+      #     |> Map.get(:characters)
+      #     |> case do
+      #       nil ->
+      #         []
+      #       [] ->
+      #         []
+      #       characters ->
+      #         characters
+      #         |> Enum.flat_map(&Map.get(&1, :items, []))
+      #     end
+      #   {:error, _} ->
+      #     []
+      # end
+
 
     # |> Data.get_character_items()
 

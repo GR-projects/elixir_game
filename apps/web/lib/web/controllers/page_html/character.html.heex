@@ -1,0 +1,18 @@
+<%= if Data.has_characters?(@user) do %>
+  <p>User has characters</p>
+  <%= for character <- Data.get_user_characters(@user) do %>
+    <.link navigate={~p"/character/#{character.id}"} class="">
+      <div>
+        <strong><%= character.name %></strong>
+        (<%= character.type %>) - Level <%= character.level %> - Exp <%= character.experience %>
+      </div>
+    </.link>
+  <% end %>
+<% else %>
+  <p>User has no characters</p>
+<% end %>
+
+
+<.link navigate={~p"/character/new"} class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+  Add new character
+</.link>

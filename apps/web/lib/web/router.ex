@@ -62,6 +62,7 @@ defmodule Web.Router do
     get "/", PageController, :main
     get "/equipment", PageController, :equipment
     post "/logout", AuthController, :logout
+    resources "/character", CharacterController
   end
 
   scope "/", Web do

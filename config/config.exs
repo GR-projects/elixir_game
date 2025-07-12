@@ -21,6 +21,9 @@ config :data, Data.Repo,
 
 config :data, :ecto_repos, [Data.Repo]
 
+config :utils, Utils.ETS,
+  tables: [:users]
+
 # Configures the endpoint
 config :web, Web.Endpoint,
   url: [host: "localhost"],

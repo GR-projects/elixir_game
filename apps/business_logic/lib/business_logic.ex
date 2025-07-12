@@ -4,6 +4,7 @@ defmodule BusinessLogic do
   """
 
   defdelegate user_changeset(params \\ %{}), to: Data.User, as: :changeset
+  defdelegate character_changeset(params \\ %{}), to: Data.Character, as: :changeset
 
   def create_user(%{"password" => password} = params) do
     hashed_password = Bcrypt.hash_pwd_salt(password)
@@ -24,6 +25,34 @@ defmodule BusinessLogic do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user) do
+  def get_user_items(user = %{login: login}) do
+    case Utils.ETS.lookup(:users, login) do
+      {:ok, cached_user} ->
+        cached_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+      {:error, :not_found} ->
+        ets_user = user |> Data.Repo.preload(characters: :items)
+        Utils.ETS.insert(:users, {login, ets_user})
+        ets_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+    end
+  end
+
+  def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do
+    params
+    |> Map.put("level", 1)
+    |> Map.put("experience", 0)
+    |> Map.put("user_id", user_id)
+    |> Data.create_character()
+  end
+
+  def get_character(id) do
+    Data.get_character(id)
+  end
+
+  def delete_character(id) do
+    Data.delete_character(id)
   end
 end
