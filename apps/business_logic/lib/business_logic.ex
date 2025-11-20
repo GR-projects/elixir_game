@@ -33,11 +33,12 @@ defmodule BusinessLogic do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user = %{login: login}) do
+  def get_user_items(_user = %{login: login}) do
     case Utils.ETS.lookup(:users, login) do
       {:ok, cached_user} ->
         cached_user
-        |> Map.get(:characters) || []
+        |> Map.get(:characters)
+        |> Kernel.||([])
         |> Enum.flat_map(&Map.get(&1, :items, []))
       {:error, :not_found} ->
         db_user = Data.Repo.get_by(Data.User, login: login)

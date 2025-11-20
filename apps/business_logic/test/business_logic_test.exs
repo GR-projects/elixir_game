@@ -1,6 +1,5 @@
 defmodule BusinessLogicTest do
   use ExUnit.Case, async: false
-  import BusinessLogic.TestHelpers
 
   # Setup and teardown for each test
   setup do
@@ -58,7 +57,7 @@ defmodule BusinessLogicTest do
 
     test "returns error for incorrect password" do
       params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser", "password" => "password123"}
-      {:ok, user} = BusinessLogic.create_user(params)
+      {:ok, _user} = BusinessLogic.create_user(params)
 
       result = BusinessLogic.authenticate_user(%{"password" => "wrongpassword", "login" => params["login"]})
       assert result == {:error, :authentication_failed}
@@ -66,7 +65,7 @@ defmodule BusinessLogicTest do
 
     test "handles empty password gracefully" do
       params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser", "password" => "password123"}
-      {:ok, user} = BusinessLogic.create_user(params)
+      {:ok, _user} = BusinessLogic.create_user(params)
 
       result = BusinessLogic.authenticate_user(%{"password" => "", "login" => params["login"]})
       assert result == {:error, :authentication_failed}
