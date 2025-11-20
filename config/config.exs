@@ -57,15 +57,6 @@ config :tailwind,
     cd: Path.expand("../apps/web/assets", __DIR__)
   ]
 
-# Sample configuration:
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
-#
-import Config
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

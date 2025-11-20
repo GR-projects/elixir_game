@@ -80,6 +80,7 @@ defmodule Data do
   def get_character(id) do
     Character.base_query()
     |> where([{^Character.binding_name(), c}], c.id == ^id)
+    |> preload([:items])
     |> Repo.one()
     |> case do
       nil -> {:error, nil}

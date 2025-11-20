@@ -46,4 +46,12 @@ defmodule Utils.ETS do
   def delete(table_name, key) do
     :ets.delete(table_name, key)
   end
+
+  @doc """
+  Clears all entries from the specified ETS table.
+  """
+  @spec clear(atom()) :: true
+  def clear(table_name) do
+    :ets.delete_all_objects(table_name)
+  end
 end
