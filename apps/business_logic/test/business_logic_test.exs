@@ -36,10 +36,13 @@ defmodule BusinessLogicTest do
     test "creates user with hashed password" do
       params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser", "password" => "password123"}
       {:ok, user} = BusinessLogic.create_user(params)
-      assert user.name == "Test User"
-      assert user.email == "test@example.com"
-      assert user.login == "testuser"
-      assert Bcrypt.verify_pass("password123", user.password_hash)
+      assert %{
+        name: "Test User",
+        email: "test@example.com",
+        login: "testuser",
+        password_hash: password_hash
+      } = Map.take(user, [:name, :email, :login, :password_hash])
+      assert Bcrypt.verify_pass("password123", password_hash)
     end
   end
 
@@ -84,12 +87,13 @@ defmodule BusinessLogicTest do
       updated_user = %{cached_user | characters: [%{items: [%{name: "Sword"}]}]}
       Utils.ETS.insert(:users, {params["login"], updated_user})
       assert {:ok, ets_user} = Utils.ETS.lookup(:users, params["login"])
-      assert is_list(ets_user.characters)
-      assert length(ets_user.characters) == 1
+      assert [character] = ets_user.characters
+      assert [cached_item] = character.items
+      assert Map.take(cached_item, [:name]) == %{name: "Sword"}
 
       items = BusinessLogic.get_user_items(user)
-      assert length(items) == 1
-      assert hd(items).name == "Sword"
+      assert [item] = items
+      assert Map.take(item, [:name]) == %{name: "Sword"}
     end
 
     test "retrieves items from database when not cached" do
@@ -107,8 +111,13 @@ defmodule BusinessLogicTest do
       Data.Repo.all(Data.Character) |> Data.Repo.preload(:items)
 
       items = BusinessLogic.get_user_items(user)
-      assert length(items) == 1
-      assert hd(items).name == "Sword"
+      assert [item] = items
+      assert Map.take(item, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
     end
 
     test "returns empty list for user with no characters" do
@@ -128,16 +137,176 @@ defmodule BusinessLogicTest do
 
       # Verify user is cached in ETS and contains the new character
       assert {:ok, cached_user} = Utils.ETS.lookup(:users, params["login"])
-      assert Enum.any?(cached_user.characters || [], fn c ->
-        c.name == "Aragorn" and c.type == "warrior"
-      end)
+      assert [character] = cached_user.characters || []
+      assert Map.take(character, [:name, :type]) == %{
+        name: "Aragorn",
+        type: "warrior"
+      }
 
       [character] = Data.get_user_characters(user)
-      assert character.name == "Aragorn"
-      assert character.type == "warrior"
+      assert Map.take(character, [:name, :type]) == %{
+        name: "Aragorn",
+        type: "warrior"
+      }
 
       items = BusinessLogic.get_user_items(user)
       assert items == []
+    end
+
+    test "caches user data after first database lookup" do
+      params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser_cache1", "password" => "password123"}
+      {:ok, user} = BusinessLogic.create_user(params)
+      {:ok, character} = BusinessLogic.create_character(user, %{"type" => "warrior", "name" => "Aragorn"})
+      {:ok, _item} = Data.Repo.insert(%Data.Item{name: "Sword", type: :sword, position: :right_hand, equipped?: false, character_id: character.id})
+
+      # Clear cache to simulate cache miss
+      Utils.ETS.delete(:users, params["login"])
+      {:error, :not_found} = Utils.ETS.lookup(:users, params["login"])
+
+      # First call: cache miss, should hit database and populate cache
+      items = BusinessLogic.get_user_items(user)
+      assert [item] = items
+      assert Map.take(item, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      # Verify cache was populated
+      assert {:ok, cached_user} = Utils.ETS.lookup(:users, params["login"])
+      assert [character] = cached_user.characters
+      assert Map.take(character, [:name, :type]) == %{
+        name: "Aragorn",
+        type: "warrior"
+      }
+      assert [cached_item] = character.items
+      assert Map.take(cached_item, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      # Second call: cache hit, should use cached data
+      items2 = BusinessLogic.get_user_items(user)
+      assert [item2] = items2
+      assert Map.take(item2, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
+    end
+
+    test "handles cache invalidation gracefully" do
+      params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser_cache2", "password" => "password123"}
+      {:ok, user} = BusinessLogic.create_user(params)
+      {:ok, character} = BusinessLogic.create_character(user, %{"type" => "mage", "name" => "Gandalf"})
+      {:ok, _item} = Data.Repo.insert(%Data.Item{name: "Staff", type: :staff, position: :right_hand, equipped?: false, character_id: character.id})
+
+      # Clear cache to simulate cache miss
+      Utils.ETS.delete(:users, params["login"])
+      {:error, :not_found} = Utils.ETS.lookup(:users, params["login"])
+
+      # First call: cache miss, should hit database
+      items = BusinessLogic.get_user_items(user)
+      assert [item] = items
+      assert Map.take(item, [:name, :type, :position, :equipped?]) == %{
+        name: "Staff",
+        type: :staff,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      # Verify cache was populated
+      assert {:ok, _cached_user} = Utils.ETS.lookup(:users, params["login"])
+
+      # Cache cleared, should hit database again
+      Utils.ETS.delete(:users, params["login"])
+      {:error, :not_found} = Utils.ETS.lookup(:users, params["login"])
+
+      items2 = BusinessLogic.get_user_items(user)
+      assert [item2] = items2
+      assert Map.take(item2, [:name, :type, :position, :equipped?]) == %{
+        name: "Staff",
+        type: :staff,
+        position: :right_hand,
+        equipped?: false
+      }
+    end
+
+    test "caches different users separately" do
+      params1 = %{"name" => "Test User 1", "email" => "test1@example.com", "login" => "testuser_cache3", "password" => "password123"}
+      params2 = %{"name" => "Test User 2", "email" => "test2@example.com", "login" => "testuser_cache4", "password" => "password123"}
+
+      {:ok, user1} = BusinessLogic.create_user(params1)
+      {:ok, user2} = BusinessLogic.create_user(params2)
+
+      {:ok, character1} = BusinessLogic.create_character(user1, %{"type" => "warrior", "name" => "Aragorn"})
+      {:ok, character2} = BusinessLogic.create_character(user2, %{"type" => "archer", "name" => "Legolas"})
+
+      {:ok, _item1} = Data.Repo.insert(%Data.Item{name: "Sword", type: :sword, position: :right_hand, equipped?: false, character_id: character1.id})
+      {:ok, _item2} = Data.Repo.insert(%Data.Item{name: "Bow", type: :bow, position: :right_hand, equipped?: false, character_id: character2.id})
+
+      # Clear cache for both users
+      Utils.ETS.delete(:users, params1["login"])
+      Utils.ETS.delete(:users, params2["login"])
+
+      # First call for user1: cache miss, should hit database and cache
+      items1 = BusinessLogic.get_user_items(user1)
+      assert [item1] = items1
+      assert Map.take(item1, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      # First call for user2: cache miss, should hit database and cache
+      items2 = BusinessLogic.get_user_items(user2)
+      assert [item2] = items2
+      assert Map.take(item2, [:name, :type, :position, :equipped?]) == %{
+        name: "Bow",
+        type: :bow,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      # Verify both users are cached separately
+      assert {:ok, cached_user1} = Utils.ETS.lookup(:users, params1["login"])
+      assert {:ok, cached_user2} = Utils.ETS.lookup(:users, params2["login"])
+
+      assert [character1] = cached_user1.characters
+      assert Map.take(character1, [:name, :type]) == %{
+        name: "Aragorn",
+        type: "warrior"
+      }
+
+      assert [character2] = cached_user2.characters
+      assert Map.take(character2, [:name, :type]) == %{
+        name: "Legolas",
+        type: "archer"
+      }
+
+      # Retrieve from cache - should still get correct items
+      cached_items1 = BusinessLogic.get_user_items(user1)
+      assert [cached_item1] = cached_items1
+      assert Map.take(cached_item1, [:name, :type, :position, :equipped?]) == %{
+        name: "Sword",
+        type: :sword,
+        position: :right_hand,
+        equipped?: false
+      }
+
+      cached_items2 = BusinessLogic.get_user_items(user2)
+      assert [cached_item2] = cached_items2
+      assert Map.take(cached_item2, [:name, :type, :position, :equipped?]) == %{
+        name: "Bow",
+        type: :bow,
+        position: :right_hand,
+        equipped?: false
+      }
     end
   end
 
@@ -146,11 +315,13 @@ defmodule BusinessLogicTest do
       params = %{"name" => "Test User", "email" => "test@example.com", "login" => "testuser", "password" => "password123"}
       {:ok, user} = BusinessLogic.create_user(params)
       {:ok, character} = BusinessLogic.create_character(user, %{"type" => "mage", "name" => "Gandalf"})
-      assert character.type == "mage"
-      assert character.name == "Gandalf"
-      assert character.level == 1
-      assert character.experience == 0.0
-      assert character.user_id == user.id
+      assert Map.take(character, [:type, :name, :level, :experience, :user_id]) == %{
+        type: "mage",
+        name: "Gandalf",
+        level: 1,
+        experience: 0.0,
+        user_id: user.id
+      }
     end
   end
 
