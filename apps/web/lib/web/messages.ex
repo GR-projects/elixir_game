@@ -1,4 +1,7 @@
 defmodule Web.Messages do
+  @moduledoc """
+  Module for user-facing messages and notifications.
+  """
   def user_registration_success, do: "User successfully registered"
 
   def user_registration_failure, do: "Error during user registration"

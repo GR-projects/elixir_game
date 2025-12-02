@@ -33,7 +33,7 @@ defmodule BusinessLogic do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(_user = %{login: login}) do
+  def get_user_items(%{login: login} = _user) do
     case Utils.ETS.lookup(:users, login) do
       {:ok, cached_user} ->
         cached_user
@@ -55,7 +55,7 @@ defmodule BusinessLogic do
     end
   end
 
-  def create_character(_user = %{id: user_id, login: login} = user, %{"type" => _type, "name" => _name} = params) do
+  def create_character(%{id: user_id, login: login} = user, %{"type" => _type, "name" => _name} = params) do
     params
     |> Map.put("level", 1)
     |> Map.put("experience", 0)

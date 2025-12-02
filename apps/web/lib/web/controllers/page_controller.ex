@@ -13,7 +13,6 @@ defmodule Web.PageController do
 
   def equipment(conn, _params) do
     items = BusinessLogic.get_user_items(conn.assigns.user)
-    dbg(items)
     render(conn, :equipment, equipment: items)
   end
 end

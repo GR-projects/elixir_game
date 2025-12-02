@@ -1,4 +1,7 @@
 defmodule Data.ItemStats do
+  @moduledoc """
+  Schema for item statistics.
+  """
   use Ecto.Schema
 
   @type t :: %__MODULE__{}

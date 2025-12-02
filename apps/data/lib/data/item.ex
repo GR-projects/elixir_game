@@ -1,4 +1,7 @@
 defmodule Data.Item do
+  @moduledoc """
+  Schema for game items.
+  """
   use Ecto.Schema
 
   @type t :: %__MODULE__{}

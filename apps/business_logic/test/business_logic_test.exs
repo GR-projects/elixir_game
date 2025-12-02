@@ -1,10 +1,12 @@
 defmodule BusinessLogicTest do
   use ExUnit.Case, async: false
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   # Setup and teardown for each test
   setup do
     # Start a transaction for this test
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Data.Repo)
+    :ok = Sandbox.checkout(Data.Repo)
 
     # Clean up ETS tables before each test
     Utils.ETS.clear(:users)
@@ -100,7 +102,6 @@ defmodule BusinessLogicTest do
       # Ensure we are not using ETS cache
       Utils.ETS.delete(:users, params["login"])
       {:error, :not_found} = Utils.ETS.lookup(:users, params["login"])
-
 
       Data.Repo.all(Data.User) |> Data.Repo.preload(:characters)
       Data.Repo.all(Data.Character) |> Data.Repo.preload(:items)

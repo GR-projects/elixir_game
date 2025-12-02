@@ -1,8 +1,11 @@
 defmodule Data do
+  @moduledoc """
+  Data access layer for the application.
+  """
+  alias Data.Character
   alias Data.Item
   alias Data.Repo
   alias Data.User
-  alias Data.Character
   alias Utils.ETS
 
   import Ecto.Query
@@ -44,7 +47,7 @@ defmodule Data do
     |> Repo.all()
   end
 
-  def has_characters?(_user = %{id: id}) do
+  def has_characters?(%{id: id} = _user) do
     Character.base_query()
     |> where([{^Character.binding_name(), c}], c.user_id == ^id)
     |> select([{^Character.binding_name(), c}], count(c.id))
@@ -55,7 +58,7 @@ defmodule Data do
     end
   end
 
-  def get_user_characters(user = %{login: login}) do
+  def get_user_characters(%{login: login} = user) do
     case ETS.lookup(:users, login) do
       {:ok, %{characters: characters}} ->
         characters

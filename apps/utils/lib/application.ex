@@ -1,4 +1,7 @@
 defmodule Utils.Application do
+  @moduledoc """
+  Application module for the Utils application.
+  """
   use Application
   alias Utils.ETS
 

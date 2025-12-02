@@ -1,4 +1,7 @@
 defmodule Data.Application do
+  @moduledoc """
+  Application module for the Data application.
+  """
   use Application
 
   def start(_type, _args) do

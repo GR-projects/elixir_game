@@ -11,7 +11,6 @@ defmodule Utils.ETS do
   @spec init([atom()] | nil) :: :ok
   def init(tables \\ nil) do
     tables = tables || Application.get_env(:utils, Utils.ETS)[:tables] || []
-    |> dbg()
     Enum.each(tables, fn table_name ->
       :ets.new(table_name, [:named_table, :set, :public, read_concurrency: true, write_concurrency: true])
     end)

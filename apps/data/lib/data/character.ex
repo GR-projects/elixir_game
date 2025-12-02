@@ -1,6 +1,9 @@
 defmodule Data.Character do
-  alias Data.User
+  @moduledoc """
+  Schema for game characters.
+  """
   alias Data.Item
+  alias Data.User
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
@@ -28,9 +31,9 @@ defmodule Data.Character do
     |> validate_required([:name, :type, :level, :experience, :user_id])
   end
 
-  def binding_name(), do: :character
+  def binding_name, do: :character
 
-  def base_query() do
+  def base_query do
     __MODULE__
     |> from(as: ^binding_name())
   end

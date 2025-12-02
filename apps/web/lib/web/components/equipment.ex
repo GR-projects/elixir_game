@@ -1,4 +1,7 @@
 defmodule Web.Components.Equipment do
+  @moduledoc """
+  Components for displaying equipment slots and items.
+  """
   use Phoenix.Component
 
   attr :item, :map, default: nil
