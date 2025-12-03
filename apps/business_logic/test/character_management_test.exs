@@ -1,13 +1,8 @@
 defmodule BusinessLogic.CharacterManagementTest do
-  use ExUnit.Case, async: false
-
-  alias Ecto.Adapters.SQL.Sandbox
+  use BusinessLogic.Test.Support.DataCase, async: false
 
   # Setup and teardown for each test
   setup do
-    # Start a transaction for this test
-    :ok = Sandbox.checkout(Data.Repo)
-
     # Clean up ETS tables before each test
     Utils.ETS.clear(:users)
 

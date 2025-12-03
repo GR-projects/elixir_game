@@ -1,4 +1,4 @@
-defmodule BusinessLogic.ETSCachingTest do
+defmodule Utils.ETSCachingTest do
   use ExUnit.Case, async: false
 
   describe "ETS module operations" do

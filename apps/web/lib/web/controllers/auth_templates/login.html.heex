@@ -17,3 +17,9 @@
     </:actions>
   </.simple_form>
 </div>
+
+<%= if msg = Phoenix.Flash.get(@flash, :error) do %>
+  <div class="alert alert-danger">
+    <%= msg %>
+  </div>
+<% end %>

@@ -25,7 +25,10 @@ defmodule Web.Router do
   defp ensure_authorized(conn, _opts) do
     case get_session(conn, :user) do
       nil ->
-        redirect(conn, to: "/login")
+        conn
+        # |> put_flash(:error, "You must be logged in")
+        |> redirect(to: "/login")
+        |> halt()
 
       user ->
         conn
@@ -41,7 +44,8 @@ defmodule Web.Router do
       user ->
         conn
         |> assign(:user, user)
-        |> redirect(to: "/")
+        |> redirect(to: "/main")
+        |> halt()
     end
   end
 
@@ -56,21 +60,33 @@ defmodule Web.Router do
   #   get "/posts/new", PostController, :new
   #   post "/posts", PostController, :create
   # end
+
+  # # PUBLIC ROUTES - anyone can access
+  scope "/", Web do
+    pipe_through [:browser]
+
+    get "/", PageController, :home
+  end
+
+  # AUTHENTICATED ROUTES - only for logged-in users
   scope "/", Web do
     pipe_through [:browser, :auth]
-    get "/showMe", AuthController, :show
-    get "/", PageController, :main
+
+    get "/main", PageController, :main
     get "/equipment", PageController, :equipment
+    get "/showMe", AuthController, :show
     post "/logout", AuthController, :logout
     resources "/character", CharacterController
   end
 
+  # UNAUTHENTICATED ROUTES - only for logged-out users
   scope "/", Web do
     pipe_through [:browser, :unauth]
-    post "/register", AuthController, :register
-    get "/register", AuthController, :register_page
+
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
+    get "/register", AuthController, :register_page
+    post "/register", AuthController, :register
   end
 
   # Other scopes may use custom stacks.

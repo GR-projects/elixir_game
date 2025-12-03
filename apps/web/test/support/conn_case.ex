@@ -22,7 +22,10 @@ defmodule Web.ConnCase do
       # The default endpoint for testing
       @endpoint Web.Endpoint
 
-      use Web, :verified_routes
+      use Phoenix.VerifiedRoutes,
+        endpoint: Web.Endpoint,
+        router: Web.Router,
+        statics: Web.static_paths()
 
       # Import conveniences for testing with connections
       import Plug.Conn
@@ -32,7 +35,15 @@ defmodule Web.ConnCase do
   end
 
   setup tags do
-    Web.DataCase.setup_sandbox(tags)
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Data.Repo)
+
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(Data.Repo, {:shared, self()})
+    end
+
+    conn =
+      Phoenix.ConnTest.build_conn()
+
+    {:ok, conn: conn}
   end
 end
