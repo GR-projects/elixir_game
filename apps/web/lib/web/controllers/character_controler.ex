@@ -3,12 +3,14 @@ defmodule Web.CharacterController do
   alias Web.Messages
 
   def index(conn, _params) do
+    IO.inspect("here index")
     case get_session(conn, :user) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
       user ->
+        IO.inspect(user)
         changeset = BusinessLogic.character_changeset()
 
         conn

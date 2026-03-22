@@ -22,11 +22,14 @@ defmodule Data do
     case ETS.lookup(:users, login) do
       {:ok, user} ->
         user
+
       {:error, :not_found} ->
         user = Repo.get_by(User, login: login)
 
         case user do
-          nil -> nil
+          nil ->
+            nil
+
           user ->
             ets_user = user |> Repo.preload(characters: :items)
             ETS.insert(:users, {login, ets_user})
@@ -59,6 +62,7 @@ defmodule Data do
     case ETS.lookup(:users, login) do
       {:ok, %{characters: characters}} ->
         characters
+
       {:error, :not_found} ->
         ets_user = user |> Repo.preload(characters: :items)
         ETS.insert(:users, {login, ets_user})
@@ -69,11 +73,23 @@ defmodule Data do
   @spec create_character(map()) :: {:ok, Character.t()} | {:error, list()}
   def create_character(params) do
     changeset = Data.Character.changeset(%Data.Character{}, params)
-    |> IO.inspect(label: "char cha")
 
     case Repo.insert(changeset) do
-      {:ok, character} -> {:ok, character}
-      {:error, changeset} -> {:error, changeset.errors}
+      {:ok, character} ->
+        # Reload the owning user and replace the cache entry so it's authoritative
+        case Repo.get(User, character.user_id) do
+          nil ->
+            :ok
+
+          user ->
+            ets_user = Repo.preload(user, characters: :items)
+            ETS.insert(:users, {user.login, ets_user})
+        end
+
+        {:ok, character}
+
+      {:error, changeset} ->
+        {:error, changeset.errors}
     end
   end
 
@@ -94,8 +110,25 @@ defmodule Data do
     case get_character(id) do
       {:error, _} = error ->
         error
+
       {:ok, character} = result ->
-        Repo.delete(character)
+        # attempt DB delete and, on success, update ETS cache for the owning user
+        case Repo.delete(character) do
+          {:ok, _deleted} ->
+            # Reload the owning user and replace the cache entry so it's authoritative
+            case Repo.get(User, character.user_id) do
+              nil ->
+                :ok
+
+              user ->
+                ets_user = Repo.preload(user, characters: :items)
+                ETS.insert(:users, {user.login, ets_user})
+            end
+
+          _ ->
+            :ok
+        end
+
         result
     end
   end
