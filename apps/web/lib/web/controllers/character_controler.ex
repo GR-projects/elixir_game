@@ -54,14 +54,19 @@ defmodule Web.CharacterController do
   end
 
   def show(conn, %{"id" => id}) do
+    IO.inspect(id)
     case get_session(conn, :user) do
       nil ->
+        IO.inspect("here")
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
       user ->
+        IO.inspect(user)
+        IO.inspect(BusinessLogic.get_character(id))
         case BusinessLogic.get_character(id) do
           {:ok, character} ->
+            IO.inspect(character)
             conn
             |> assign(:user, user)
             |> render(:show, character: character)

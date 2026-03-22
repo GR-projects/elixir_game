@@ -29,13 +29,17 @@ defmodule BusinessLogic do
     case Utils.ETS.lookup(:users, login) do
       {:ok, cached_user} ->
         cached_user
+        |> IO.inspect(label: "cached_user")
         |> Map.get(:characters, [])
+        |> IO.inspect()
         |> Enum.flat_map(&Map.get(&1, :items, []))
       {:error, :not_found} ->
         ets_user = user |> Data.Repo.preload(characters: :items)
         Utils.ETS.insert(:users, {login, ets_user})
         ets_user
+        |> IO.inspect(label: "ets_user")
         |> Map.get(:characters, [])
+        |> IO.inspect()
         |> Enum.flat_map(&Map.get(&1, :items, []))
     end
   end
@@ -48,8 +52,15 @@ defmodule BusinessLogic do
     |> Data.create_character()
   end
 
-  def get_character(id) do
+  def get_character(id) when is_integer(id) do
     Data.get_character(id)
+  end
+  
+  def get_character(id) when is_binary(id) do
+    IO.inspect(id, label: "id")
+    IO.inspect("here12")
+    IO.inspect(String.to_integer(id), label: "String.to_integer(id)")
+    Data.get_character(String.to_integer(id))
   end
 
   def delete_character(id) do

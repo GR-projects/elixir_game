@@ -69,6 +69,7 @@ defmodule Data do
   @spec create_character(map()) :: {:ok, Character.t()} | {:error, list()}
   def create_character(params) do
     changeset = Data.Character.changeset(%Data.Character{}, params)
+    |> IO.inspect(label: "char cha")
 
     case Repo.insert(changeset) do
       {:ok, character} -> {:ok, character}
@@ -80,6 +81,7 @@ defmodule Data do
   def get_character(id) do
     Character.base_query()
     |> where([{^Character.binding_name(), c}], c.id == ^id)
+    |> IO.inspect(label: "get char")
     |> Repo.one()
     |> case do
       nil -> {:error, nil}
