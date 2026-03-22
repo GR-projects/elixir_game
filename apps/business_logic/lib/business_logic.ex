@@ -1,11 +1,40 @@
 defmodule BusinessLogic do
   @moduledoc """
-  Documentation for `BusinessLogic`.
+  The main BusinessLogic module.
+  
+  This module provides the public API for the BusinessLogic application.
   """
-
-  defdelegate user_changeset(params \\ %{}), to: Data.User, as: :changeset
-  defdelegate character_changeset(params \\ %{}), to: Data.Character, as: :changeset
-
+  
+  # Add your business logic functions here
+  
+  @doc """
+  Example function that demonstrates business logic.
+  """
+  @spec example_function(String.t()) :: String.t()
+  def example_function(name) do
+    "Hello, #{name}!"
+  end
+  
+  # Add other business logic functions here
+  
+  # Data access functions
+  
+  @doc """
+  Gets a character by ID.
+  """
+  @spec get_character(integer()) :: map() | nil
+  def get_character(id) do
+    Data.get_character(id)
+  end
+  
+  @doc """
+  Deletes a character by ID.
+  """
+  @spec delete_character(integer()) :: :ok | {:error, String.t()}
+  def delete_character(id) do
+    Data.delete_character(id)
+  end
+  
   def create_user(%{"password" => password} = params) do
     hashed_password = Bcrypt.hash_pwd_salt(password)
 

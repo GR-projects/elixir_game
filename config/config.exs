@@ -45,6 +45,22 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
+# Configure DelayedTasks
+config :delayed_tasks,
+  # Default settings for all tasks
+  default_max_attempts: 3,
+  base_backoff_seconds: 5,
+  max_backoff_seconds: 3600,  # 1 hour
+  check_interval_ms: 1_000,   # 1 second
+  batch_size: 10,
+  
+  # Example handlers (replace with your actual handlers)
+  handlers: [
+    # Example:
+    # email: MyApp.EmailHandler,
+    # notification: MyApp.NotificationHandler
+  ]
+
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.4.3",
