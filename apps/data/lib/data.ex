@@ -74,7 +74,7 @@ defmodule Data do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user = %{login: login}) do
+  def get_user_items(_user = %{login: login}) do
     case ETS.lookup(:users, login) do
       {:ok, cached_user} ->
         cached_user
@@ -157,7 +157,7 @@ defmodule Data do
   end
 
   # Reloads the user from DB and updates ETS cache (preloading characters -> items -> stats).
-  # Accepts either a user id (integer) or login (binary). 
+  # Accepts either a user id (integer) or login (binary).
   # Returns {:ok, ets_user} or {:error, :not_found}.
   defp reload_user_cache(identifier) when is_integer(identifier) do
     case Repo.get(User, identifier) do
