@@ -19,7 +19,8 @@ defmodule BusinessLogic.MixProject do
   def application do
     [
       extra_applications: [:logger, :crypto],
-      mod: {BusinessLogic.Application, []}
+      mod: {BusinessLogic.Application, []},
+      start_phases: [register_handlers: []]
     ]
   end
 
@@ -28,10 +29,8 @@ defmodule BusinessLogic.MixProject do
     [
       {:bcrypt_elixir, "~> 3.2.0"},
       {:jason, "~> 1.4"},
-      # Add other dependencies as needed
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
-      # {:sibling_app_in_umbrella, in_umbrella: true}
+      {:data, in_umbrella: true},
+      {:delayed_tasks, in_umbrella: true}
     ]
   end
 end

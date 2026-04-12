@@ -1,0 +1,78 @@
+<h1>Buildings</h1>
+
+<%= if Enum.empty?(@characters) do %>
+  <p class="text-red-500">No character found. Please create one first.</p>
+<% else %>
+  <div class="mb-4">
+    <form phx-change="select_character">
+      <label for="character-select" class="font-bold mr-2">Select Character:</label>
+      <select id="character-select" name="character_id" class="border rounded px-2 py-1">
+        <%= for char <- @characters do %>
+          <option value={char.id} selected={char.id == @character_id}>
+            <%= char.name %> (Level <%= char.level %>)
+          </option>
+        <% end %>
+      </select>
+    </form>
+  </div>
+<% end %>
+
+<h2>Available Buildings</h2>
+
+<div class="grid grid-cols-2 gap-4">
+  <%= for {type, info} <- Buildings.building_types() do %>
+    <div class="border p-4 rounded">
+      <h3 class="text-lg font-bold"><%= info.name %></h3>
+      <p><%= info.description %></p>
+
+      <%= if character_building = Enum.find(@buildings, fn b -> b.type == type end) do %>
+        <p class="mt-2">Current Level: <%= character_building.level %></p>
+        <p>
+          Next level build time: <%= elem(
+            Buildings.calculate_build_time(type, character_building.level + 1),
+            1
+          ) %> seconds
+        </p>
+
+        <form phx-submit="start_building" class="mt-2">
+          <input type="hidden" name="type" value={type} />
+          <button
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Upgrade to Level <%= character_building.level + 1 %>
+          </button>
+        </form>
+      <% else %>
+        <p class="mt-2 text-gray-500">Not built yet</p>
+        <p>Build time: <%= info.base_build_time %> seconds</p>
+
+        <form phx-submit="start_building" class="mt-2">
+          <input type="hidden" name="type" value={type} />
+          <button
+            type="submit"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Build
+          </button>
+        </form>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<h2 class="mt-8">Your Buildings</h2>
+
+<%= if Enum.empty?(@buildings) do %>
+  <p class="text-gray-500">No buildings yet. Start building to see them here!</p>
+<% else %>
+  <ul>
+    <%= for building <- @buildings do %>
+      <li>
+        <%= building.type %> - Level <%= building.level %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p class="mt-4"><a href="/" class="text-blue-500 hover:underline">Back to Home</a></p>

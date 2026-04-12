@@ -31,7 +31,6 @@ defmodule Web.AuthController do
         |> put_flash(:info, Messages.user_login_success())
         |> redirect(to: ~p"/")
 
-
       {:error, _} ->
         changeset = BusinessLogic.user_changeset()
 

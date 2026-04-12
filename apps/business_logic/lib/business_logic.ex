@@ -1,24 +1,26 @@
 defmodule BusinessLogic do
   @moduledoc """
   The main BusinessLogic module.
-  
+
   This module provides the public API for the BusinessLogic application.
   """
-  
-  # Add your business logic functions here
-  
+
   @doc """
-  Example function that demonstrates business logic.
+  Returns an empty changeset for the user schema.
+  Used for rendering empty forms.
   """
-  @spec example_function(String.t()) :: String.t()
-  def example_function(name) do
-    "Hello, #{name}!"
+  def user_changeset do
+    Data.User.changeset(%Data.User{}, %{})
   end
-  
-  # Add other business logic functions here
-  
-  # Data access functions
-  
+
+  @doc """
+  Returns an empty changeset for the character schema.
+  Used for rendering empty forms.
+  """
+  def character_changeset do
+    Data.Character.changeset(%Data.Character{}, %{})
+  end
+
   @doc """
   Gets a character by ID.
   """
@@ -26,15 +28,38 @@ defmodule BusinessLogic do
   def get_character(id) do
     Data.get_character(id)
   end
-  
+
   @doc """
   Deletes a character by ID.
   """
-  @spec delete_character(integer()) :: :ok | {:error, String.t()}
-  def delete_character(id) do
-    Data.delete_character(id)
+  @spec delete_character(integer(), map() | nil) :: :ok | {:error, String.t()}
+  def delete_character(id, user \\ nil) do
+    result = Data.delete_character(id)
+
+    if user do
+      case result do
+        {:ok, character} ->
+          case Utils.ETS.lookup(:users, user.login) do
+            {:ok, cached_user} ->
+              updated_user =
+                Map.update!(cached_user, :characters, fn chars ->
+                  Enum.reject(chars, &(&1.id == character.id))
+                end)
+
+              Utils.ETS.insert(:users, {user.login, updated_user})
+
+            {:error, :not_found} ->
+              :ok
+          end
+
+        {:error, _} ->
+          :ok
+      end
+    end
+
+    result
   end
-  
+
   def create_user(%{"password" => password} = params) do
     hashed_password = Bcrypt.hash_pwd_salt(password)
 
@@ -53,14 +78,66 @@ defmodule BusinessLogic do
     end
   end
 
+  @spec get_user_items(Data.User.t()) :: [map()]
+  def get_user_items(user = %{id: user_id, login: login}) do
+    case Utils.ETS.lookup(:users, login) do
+      {:ok, cached_user} ->
+        characters = Map.get(cached_user, :characters, [])
 
-  def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do
-    params
-    |> Map.put("level", 1)
-    |> Map.put("experience", 0)
-    |> Map.put("user_id", user_id)
-    |> Data.create_character()
+        characters_with_items =
+          Enum.map(characters, fn char ->
+            case char.items do
+              %Ecto.Association.NotLoaded{} ->
+                Data.Repo.preload(char, :items)
+
+              items ->
+                char
+            end
+          end)
+
+        Enum.flat_map(characters_with_items, &Map.get(&1, :items, []))
+
+      {:error, :not_found} ->
+        ets_user = user |> Data.Repo.preload(characters: :items)
+        Utils.ETS.insert(:users, {login, ets_user})
+
+        ets_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+    end
   end
+
+  def create_character(
+        user = %{id: user_id, login: login},
+        %{"type" => _type, "name" => _name} = params
+      ) do
+    result =
+      params
+      |> Map.put("level", 1)
+      |> Map.put("experience", 0)
+      |> Map.put("user_id", user_id)
+      |> Data.create_character()
+
+    case result do
+      {:ok, character} ->
+        case Utils.ETS.lookup(:users, login) do
+          {:ok, cached_user} ->
+            updated_user =
+              Map.update!(cached_user, :characters, fn chars -> [character | chars] end)
+
+            Utils.ETS.insert(:users, {login, updated_user})
+
+          {:error, :not_found} ->
+            :ok
+        end
+
+      {:error, _} ->
+        :ok
+    end
+
+    result
+  end
+
 
   def get_character(id) when is_integer(id) do
     Data.get_character(id)

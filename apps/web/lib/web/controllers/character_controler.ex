@@ -90,7 +90,7 @@ defmodule Web.CharacterController do
         render(conn, :login, layout: false, changeset: changeset)
 
       user ->
-        case BusinessLogic.delete_character(id) do
+        case BusinessLogic.delete_character(id, user) do
           {:ok, _character} ->
             conn
             |> assign(:user, user)

@@ -22,6 +22,10 @@ defmodule Web.Router do
     plug :ensure_unauthorized
   end
 
+  pipeline :admin do
+    plug :ensure_admin
+  end
+
   defp ensure_authorized(conn, _opts) do
     case get_session(conn, :user) do
       nil ->
@@ -30,6 +34,28 @@ defmodule Web.Router do
       user ->
         conn
         |> assign(:user, user)
+    end
+  end
+
+  defp ensure_admin(conn, _opts) do
+    user = conn.assigns[:user]
+
+    if user do
+      db_user = Data.get_user(user.login)
+
+      if db_user && db_user.role == "admin" do
+        assign(conn, :user, db_user)
+      else
+        conn
+        |> put_flash(:error, "Access denied. Admin only.")
+        |> redirect(to: "/")
+        |> halt()
+      end
+    else
+      conn
+      |> put_flash(:error, "Access denied. Admin only.")
+      |> redirect(to: "/")
+      |> halt()
     end
   end
 
@@ -61,8 +87,14 @@ defmodule Web.Router do
     get "/showMe", AuthController, :show
     get "/", PageController, :main
     get "/equipment", PageController, :equipment
+    live "/buildings", BuildingsLive
     post "/logout", AuthController, :logout
     resources "/character", CharacterController
+  end
+
+  scope "/admin", Web do
+    pipe_through [:browser, :auth, :admin]
+    live "/delayed-tasks", Admin.DelayedTasksLive
   end
 
   scope "/", Web do
@@ -72,11 +104,6 @@ defmodule Web.Router do
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", Web do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:web, :dev_routes) do

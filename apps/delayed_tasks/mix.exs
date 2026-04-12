@@ -25,10 +25,8 @@ defmodule DelayedTasks.MixProject do
 
   defp deps do
     [
-      # Dependencies for database operations
       {:ecto_sql, "~> 3.10"},
       {:jason, "~> 1.4"},
-      # Test dependencies
       {:mox, "~> 1.0", only: :test}
     ]
   end

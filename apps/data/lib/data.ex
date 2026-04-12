@@ -3,6 +3,7 @@ defmodule Data do
   alias Data.Repo
   alias Data.User
   alias Data.Character
+  alias Data.Building
   alias Utils.ETS
 
   import Ecto.Query
@@ -36,7 +37,7 @@ defmodule Data do
               |> Repo.preload(characters: [items: :stats])
 
             ETS.insert(:users, {login, ets_user})
-            user
+            ets_user
         end
     end
   end
@@ -181,5 +182,34 @@ defmodule Data do
         ETS.insert(:users, {identifier, ets_user})
         {:ok, ets_user}
     end
+  end
+
+  def get_character_buildings(character_id) do
+    Building
+    |> where([b], b.character_id == ^character_id)
+    |> Repo.all()
+  end
+
+  def get_character_building(character_id, type) do
+    Building
+    |> where([b], b.character_id == ^character_id and b.type == ^type)
+    |> Repo.one()
+  end
+
+  @spec create_building(map()) :: {:ok, Building.t()} | {:error, Ecto.Changeset.t()}
+  def create_building(attrs) do
+    %Building{}
+    |> Building.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_building(%Building{} = building, attrs) do
+    building
+    |> Building.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_building(%Building{} = building) do
+    Repo.delete(building)
   end
 end

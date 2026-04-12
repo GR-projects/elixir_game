@@ -1,0 +1,75 @@
+<div class="max-w-6xl mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">Admin: Delayed Tasks</h1>
+
+  <p class="text-sm text-gray-500 mb-4">
+    Auto-refreshes every <%= @refresh_interval / 1000 %> seconds
+  </p>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full border-collapse border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border border-gray-300 px-3 py-2 text-left">ID</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Type</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">State</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Scheduled At</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Execute At</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Completed At</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Attempts</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Error</th>
+          <th class="border border-gray-300 px-3 py-2 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for task <- @tasks do %>
+          <tr class={if task.state == "failed", do: "bg-red-50"}>
+            <td class="border border-gray-300 px-3 py-2 text-xs font-mono max-w-[120px] truncate">
+              <%= task.id %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2">
+              <%= task.type %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2">
+              <span class={state_class(task.state)}>
+                <%= task.state %>
+              </span>
+            </td>
+            <td class="border border-gray-300 px-3 py-2 text-xs">
+              <%= task.scheduled_at || "-" %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2 text-xs">
+              <%= task.execute_at || "-" %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2 text-xs">
+              <%= task.completed_at || "-" %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2 text-center">
+              <%= task.attempts %>/<%= task.metadata["max_attempts"] || 3 %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2 text-xs max-w-[200px] truncate text-red-600">
+              <%= task.error || "-" %>
+            </td>
+            <td class="border border-gray-300 px-3 py-2">
+              <button
+                type="button"
+                phx-click="delete_task"
+                phx-value-id={task.id}
+                phx-disable-with="Deleting..."
+                class="text-red-600 hover:text-red-800 text-sm"
+                data-confirm="Delete this task?"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%= if Enum.empty?(@tasks) do %>
+    <p class="text-gray-500 mt-4">No tasks found.</p>
+  <% end %>
+
+  <p class="mt-4"><a href="/" class="text-blue-500 hover:underline">Back to Home</a></p>
+</div>
