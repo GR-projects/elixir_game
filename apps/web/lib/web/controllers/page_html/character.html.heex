@@ -1,18 +1,77 @@
-<%= if Data.has_characters?(@user) do %>
-  <p>User has characters</p>
-  <%= for character <- Data.get_user_characters(@user) do %>
-    <.link navigate={~p"/character/#{character.id}"} class="">
-      <div>
-        <strong><%= character.name %></strong>
-        (<%= character.type %>) - Level <%= character.level %> - Exp <%= character.experience %>
-      </div>
+<!-- Character List - Dark Fantasy RPG Theme -->
+<div class="max-w-3xl mx-auto">
+  <!-- Page header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="rpg-title text-2xl mb-1">Your Characters</h1>
+      <p class="text-gray-500 text-sm">Manage your adventuring party</p>
+      <div class="rpg-divider mt-3 max-w-[200px]"></div>
+    </div>
+    <.link navigate={~p"/character/new"} class="rpg-btn text-xs">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-1.5">
+        <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+      </svg>
+      New Character
     </.link>
+  </div>
+
+  <%= if Data.has_characters?(@user) do %>
+    <div class="space-y-3">
+      <%= for character <- Data.get_user_characters(@user) do %>
+        <.link navigate={~p"/character/#{character.id}"} class="block group">
+          <div class="rpg-card p-5 transition-all duration-300 hover:-translate-y-0.5">
+            <div class="flex items-center gap-4">
+              <!-- Character icon -->
+              <div class={"w-12 h-12 rounded-xl border flex items-center justify-center flex-shrink-0 class-#{String.downcase(to_string(character.type))}"}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                  <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                </svg>
+              </div>
+
+              <!-- Character info -->
+              <div class="flex-grow min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="font-display text-lg font-semibold text-gray-100 tracking-wide truncate">
+                    <%= character.name %>
+                  </h3>
+                  <span class={"rpg-badge text-[0.65rem] class-#{String.downcase(to_string(character.type))}"}>
+                    <%= character.type %>
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-gold-500">
+                      <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" />
+                    </svg>
+                    Level <%= character.level %>
+                  </span>
+                  <span class="text-gray-600">|</span>
+                  <span><%= character.experience %> XP</span>
+                </div>
+              </div>
+
+              <!-- Arrow indicator -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-600 group-hover:text-gold-400 transition-colors flex-shrink-0">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </.link>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Empty state -->
+    <div class="rpg-card p-12 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-dark-700 border border-dark-500/50 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-gray-600">
+          <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <h3 class="font-display text-lg text-gray-400 mb-2">No Characters Yet</h3>
+      <p class="text-sm text-gray-600 mb-6">Create your first character to begin your adventure</p>
+      <.link navigate={~p"/character/new"} class="rpg-btn inline-flex">
+        Create Your First Hero
+      </.link>
+    </div>
   <% end %>
-<% else %>
-  <p>User has no characters</p>
-<% end %>
-
-
-<.link navigate={~p"/character/new"} class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-  Add new character
-</.link>
+</div>

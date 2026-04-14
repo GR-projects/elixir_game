@@ -1,13 +1,53 @@
-<.form :let={f} for={@changeset} id="create-character" action={~p"/character"}>
-    <.input
-        field={f[:type]}
-        type="select"
-        label="Character type"
-        options={["Paladin", "Barbarian", "Wizard", "Druid", "Necromancer"]}
-        prompt="Select character type"
-    />
+<!-- New Character - Dark Fantasy RPG Theme -->
+<div class="max-w-lg mx-auto">
+  <!-- Page header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-4">
+      <.link navigate={~p"/character"} class="p-1.5 rounded-lg text-gray-500 hover:text-gold-400 hover:bg-dark-700/50 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+          <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
+        </svg>
+      </.link>
+      <div>
+        <h1 class="rpg-title text-2xl">Create New Character</h1>
+      </div>
+    </div>
+    <div class="rpg-divider"></div>
+  </div>
 
-    <.input field={f[:name]} type="text" label="Character name" />
+  <!-- Character creation form -->
+  <div class="rpg-card p-8">
+    <!-- Decorative top -->
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gold-600/20 to-arcane-600/20 border border-gold-700/20 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-gold-400">
+          <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+        </svg>
+      </div>
+      <p class="text-sm text-gray-400">Choose your class and name your hero</p>
+    </div>
 
-    <.button>Submit</.button>
-</.form>
+    <.form :let={f} for={@changeset} id="create-character" action={~p"/character"}>
+      <div class="space-y-6">
+        <.input
+          field={f[:type]}
+          type="select"
+          label="Character Class"
+          options={["Paladin", "Barbarian", "Wizard", "Druid", "Necromancer"]}
+          prompt="Select your class..."
+        />
+
+        <.input field={f[:name]} type="text" label="Character Name" placeholder="Enter a name for your hero" />
+
+        <div class="pt-2">
+          <.button class="w-full rpg-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
+              <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            Create Character
+          </.button>
+        </div>
+      </div>
+    </.form>
+  </div>
+</div>

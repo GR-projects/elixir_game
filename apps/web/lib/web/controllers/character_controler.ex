@@ -75,6 +75,14 @@ defmodule Web.CharacterController do
     end
   end
 
+  # def edit(conn, %{"id" => id}) do
+  #   # TODO: Implement character editing
+  # end
+
+  # def update(conn, %{"id" => id, "character" => char_params}) do
+  #   # TODO: Implement character updating
+  # end
+
   def delete(conn, %{"id" => id}) do
     case get_session(conn, :user) do
       nil ->

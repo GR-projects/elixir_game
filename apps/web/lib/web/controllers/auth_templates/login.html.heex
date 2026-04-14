@@ -1,21 +1,49 @@
-<section class="bg-gray-800 text-white py-12">
-  <div class="container mx-auto px-6 text-center">
-    <h1 class="text-4xl font-bold mb-4">Welcome Back!</h1>
-    <p class="text-lg mb-6">Log in to access your account and continue where you left off.</p>
-    <p class="text-sm">
-      New here? <a href={~p"/register"} class="text-blue-400 hover:underline">Create an account</a>.
-    </p>
-  </div>
-</section>\
+<!-- Login Page - Dark Fantasy RPG Theme -->
+<div class="min-h-[80vh] flex items-center justify-center rpg-bg-particles">
+  <div class="relative z-10 w-full max-w-md mx-auto">
+    <!-- Header section -->
+    <div class="text-center mb-8">
+      <!-- Logo mark -->
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-500 to-gold-700 shadow-glow-gold-lg mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8 text-dark-950">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="font-display text-3xl font-bold text-gold-400 tracking-wider mb-2 text-shadow-glow">
+        Welcome Back
+      </h1>
+      <p class="text-gray-400 text-sm">
+        Log in to continue your adventure
+      </p>
+    </div>
 
-<div class="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
-  <.simple_form :let={f} for={@changeset} action={~p"/login"}>
-    <.input field={f[:login]} label="Login:" />
-    <.input field={f[:password]} type="password" label="Password:" />
-    <:actions>
-      <.button>Log in</.button>
-    </:actions>
-  </.simple_form>
+    <!-- Login form card -->
+    <div class="rpg-card p-8">
+      <.simple_form :let={f} for={@changeset} action={~p"/login"}>
+        <.input field={f[:login]} label="Login" placeholder="Enter your login" />
+        <.input field={f[:password]} type="password" label="Password" placeholder="Enter your password" />
+        <:actions>
+          <.button class="w-full rpg-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
+              <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M6 10a.75.75 0 01.75-.75h9.546l-1.048-.943a.75.75 0 111.004-1.114l2.5 2.25a.75.75 0 010 1.114l-2.5 2.25a.75.75 0 11-1.004-1.114l1.048-.943H6.75A.75.75 0 016 10z" clip-rule="evenodd" />
+            </svg>
+            Enter the Realm
+          </.button>
+        </:actions>
+      </.simple_form>
+    </div>
+
+    <!-- Register link -->
+    <div class="text-center mt-6">
+      <p class="text-gray-500 text-sm">
+        New to the realm?
+        <a href={~p"/register"} class="text-gold-400 hover:text-gold-300 font-semibold transition-colors">
+          Create an account
+        </a>
+      </p>
+    </div>
+  </div>
 </div>
 
 <%= if msg = Phoenix.Flash.get(@flash, :error) do %>
