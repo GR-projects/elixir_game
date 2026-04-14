@@ -1,5 +1,5 @@
 defmodule Web.ConnCase do
-  @moduledoc """
+    @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
 
@@ -14,6 +14,8 @@ defmodule Web.ConnCase do
   by setting `use Web.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
+
+  alias Ecto.Adapters.SQL.Sandbox
 
   use ExUnit.CaseTemplate
 
@@ -35,10 +37,10 @@ defmodule Web.ConnCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Data.Repo)
+    :ok = Sandbox.checkout(Data.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Data.Repo, {:shared, self()})
+      Sandbox.mode(Data.Repo, {:shared, self()})
     end
 
     conn =

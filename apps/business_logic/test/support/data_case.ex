@@ -1,4 +1,9 @@
 defmodule BusinessLogic.Test.Support.DataCase do
+  @moduledoc """
+  This module defines the test case to be used by tests that require
+  setting up a connection to the database.
+  """
+
   alias Ecto.Adapters.SQL.Sandbox
 
   use ExUnit.CaseTemplate

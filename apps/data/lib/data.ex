@@ -77,7 +77,7 @@ defmodule Data do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(_user = %{login: login}) do
+  def get_user_items(%{login: login} = _user) do
     case ETS.lookup(:users, login) do
       {:ok, cached_user} ->
         cached_user
@@ -134,29 +134,13 @@ defmodule Data do
 
   @spec delete_character(integer()) :: {:ok, Character.t()} | {:error, list()}
   def delete_character(id) do
-    case get_character(id) do
-      {:error, _} = error ->
-        error
-
-      {:ok, character} = result ->
-        # attempt DB delete and, on success, update ETS cache for the owning user
-        case Repo.delete(character) do
-          {:ok, _deleted} ->
-            # Reload the owning user and replace the cache entry so it's authoritative
-            case Repo.get(User, character.user_id) do
-              nil ->
-                :ok
-
-              user ->
-                ets_user = Repo.preload(user, characters: [items: :stats])
-                ETS.insert(:users, {user.login, ets_user})
-            end
-
-          _ ->
-            :ok
-        end
-
-        result
+    with {:ok, character} <- get_character(id),
+         {:ok, _} <- Repo.delete(character) do
+      reload_user_cache(character.user_id)
+      {:ok, character}
+    else
+      {:error, _} = error -> error
+      _ -> :ok
     end
   end
 

@@ -8,7 +8,7 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_registration_success())
-        |> redirect(to: ~p"/main")
+        |> redirect(to: ~p"/")
 
       {:error, _error} ->
         conn
@@ -29,7 +29,7 @@ defmodule Web.AuthController do
         conn
         |> put_session(:user, user)
         |> put_flash(:info, Messages.user_login_success())
-        |> redirect(to: ~p"/main")
+        |> redirect(to: ~p"/")
 
       {:error, _} ->
         changeset = BusinessLogic.user_changeset()
@@ -56,7 +56,7 @@ defmodule Web.AuthController do
         render(conn, :register, layout: false, changeset: changeset)
 
       _user ->
-        redirect(conn, to: ~p"/main")
+        redirect(conn, to: ~p"/")
     end
   end
 end
