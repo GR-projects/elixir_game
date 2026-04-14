@@ -61,32 +61,21 @@ defmodule Web.Router do
   #   post "/posts", PostController, :create
   # end
 
-  # # PUBLIC ROUTES - anyone can access
-  scope "/", Web do
-    pipe_through [:browser]
-
-    get "/", PageController, :home
-  end
-
-  # AUTHENTICATED ROUTES - only for logged-in users
   scope "/", Web do
     pipe_through [:browser, :auth]
-
-    get "/main", PageController, :main
-    get "/equipment", PageController, :equipment
     get "/showMe", AuthController, :show
+    get "/", PageController, :main
+    get "/equipment", PageController, :equipment
     post "/logout", AuthController, :logout
     resources "/character", CharacterController
   end
 
-  # UNAUTHENTICATED ROUTES - only for logged-out users
   scope "/", Web do
     pipe_through [:browser, :unauth]
-
+    post "/register", AuthController, :register
+    get "/register", AuthController, :register_page
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
-    get "/register", AuthController, :register_page
-    post "/register", AuthController, :register
   end
 
   # Other scopes may use custom stacks.
