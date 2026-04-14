@@ -24,21 +24,6 @@ defmodule BusinessLogic do
     end
   end
 
-  @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user = %{login: login}) do
-    case Utils.ETS.lookup(:users, login) do
-      {:ok, cached_user} ->
-        cached_user
-        |> Map.get(:characters, [])
-        |> Enum.flat_map(&Map.get(&1, :items, []))
-      {:error, :not_found} ->
-        ets_user = user |> Data.Repo.preload(characters: :items)
-        Utils.ETS.insert(:users, {login, ets_user})
-        ets_user
-        |> Map.get(:characters, [])
-        |> Enum.flat_map(&Map.get(&1, :items, []))
-    end
-  end
 
   def create_character(_user = %{id: user_id}, %{"type" => _type, "name" => _name} = params) do
     params
@@ -48,8 +33,13 @@ defmodule BusinessLogic do
     |> Data.create_character()
   end
 
-  def get_character(id) do
+  def get_character(id) when is_integer(id) do
     Data.get_character(id)
+  end
+
+  def get_character(id) when is_binary(id) do
+    # convert string id to integer for downstream Data.get_character/1
+    Data.get_character(String.to_integer(id))
   end
 
   def delete_character(id) do

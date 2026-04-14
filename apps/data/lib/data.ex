@@ -22,13 +22,19 @@ defmodule Data do
     case ETS.lookup(:users, login) do
       {:ok, user} ->
         user
+
       {:error, :not_found} ->
         user = Repo.get_by(User, login: login)
 
         case user do
-          nil -> nil
+          nil ->
+            nil
+
           user ->
-            ets_user = user |> Repo.preload(characters: :items)
+            ets_user =
+              user
+              |> Repo.preload(characters: [items: :stats])
+
             ETS.insert(:users, {login, ets_user})
             user
         end
@@ -59,10 +65,32 @@ defmodule Data do
     case ETS.lookup(:users, login) do
       {:ok, %{characters: characters}} ->
         characters
+
       {:error, :not_found} ->
-        ets_user = user |> Repo.preload(characters: :items)
+        ets_user = user |> Repo.preload(characters: [items: :stats])
         ETS.insert(:users, {login, ets_user})
         ets_user.characters
+    end
+  end
+
+  @spec get_user_items(Data.User.t()) :: [map()]
+  def get_user_items(_user = %{login: login}) do
+    case ETS.lookup(:users, login) do
+      {:ok, cached_user} ->
+        cached_user
+        |> Map.get(:characters, [])
+        |> Enum.flat_map(&Map.get(&1, :items, []))
+
+      {:error, :not_found} ->
+        case reload_user_cache(login) do
+          {:ok, ets_user} ->
+            ets_user
+            |> Map.get(:characters, [])
+            |> Enum.flat_map(&Map.get(&1, :items, []))
+
+          _ ->
+            []
+        end
     end
   end
 
@@ -71,8 +99,21 @@ defmodule Data do
     changeset = Data.Character.changeset(%Data.Character{}, params)
 
     case Repo.insert(changeset) do
-      {:ok, character} -> {:ok, character}
-      {:error, changeset} -> {:error, changeset.errors}
+      {:ok, character} ->
+        # Reload the owning user and replace the cache entry so it's authoritative
+        case Repo.get(User, character.user_id) do
+          nil ->
+            :ok
+
+          user ->
+            ets_user = Repo.preload(user, characters: [items: :stats])
+            ETS.insert(:users, {user.login, ets_user})
+        end
+
+        {:ok, character}
+
+      {:error, changeset} ->
+        {:error, changeset.errors}
     end
   end
 
@@ -92,9 +133,53 @@ defmodule Data do
     case get_character(id) do
       {:error, _} = error ->
         error
+
       {:ok, character} = result ->
-        Repo.delete(character)
+        # attempt DB delete and, on success, update ETS cache for the owning user
+        case Repo.delete(character) do
+          {:ok, _deleted} ->
+            # Reload the owning user and replace the cache entry so it's authoritative
+            case Repo.get(User, character.user_id) do
+              nil ->
+                :ok
+
+              user ->
+                ets_user = Repo.preload(user, characters: [items: :stats])
+                ETS.insert(:users, {user.login, ets_user})
+            end
+
+          _ ->
+            :ok
+        end
+
         result
+    end
+  end
+
+  # Reloads the user from DB and updates ETS cache (preloading characters -> items -> stats).
+  # Accepts either a user id (integer) or login (binary).
+  # Returns {:ok, ets_user} or {:error, :not_found}.
+  defp reload_user_cache(identifier) when is_integer(identifier) do
+    case Repo.get(User, identifier) do
+      nil ->
+        {:error, :not_found}
+
+      user ->
+        ets_user = Repo.preload(user, characters: [items: :stats])
+        ETS.insert(:users, {user.login, ets_user})
+        {:ok, ets_user}
+    end
+  end
+
+  defp reload_user_cache(identifier) when is_binary(identifier) do
+    case Repo.get_by(User, login: identifier) do
+      nil ->
+        {:error, :not_found}
+
+      user ->
+        ets_user = Repo.preload(user, characters: [items: :stats])
+        ETS.insert(:users, {identifier, ets_user})
+        {:ok, ets_user}
     end
   end
 end

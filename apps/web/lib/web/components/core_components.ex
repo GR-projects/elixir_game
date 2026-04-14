@@ -50,7 +50,7 @@ defmodule Web.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div id={"#{@id}-bg"} class="bg-dark-950/80 backdrop-blur-sm fixed inset-0 transition-opacity" aria-hidden="true" />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -66,7 +66,7 @@ defmodule Web.CoreComponents do
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+              class="relative hidden rounded-2xl bg-dark-800 border border-gold-700/20 p-14 shadow-xl shadow-dark-950/50 transition"
             >
               <div class="absolute top-6 right-5">
                 <button
@@ -115,9 +115,9 @@ defmodule Web.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-xl p-3 ring-1 backdrop-blur-sm shadow-lg",
+        @kind == :info && "bg-emerald-900/80 text-emerald-200 ring-emerald-500/40 fill-emerald-300",
+        @kind == :error && "bg-crimson-900/80 text-crimson-200 ring-crimson-500/40 fill-crimson-300 shadow-glow-crimson"
       ]}
       {@rest}
     >
@@ -202,7 +202,7 @@ defmodule Web.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-6 space-y-6">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
@@ -231,8 +231,12 @@ defmodule Web.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-lg py-2.5 px-5",
+        "font-display text-sm font-semibold tracking-wider uppercase leading-6",
+        "bg-gradient-to-b from-gold-600 to-gold-700 text-dark-950",
+        "border border-gold-500/50 shadow-glow-gold",
+        "hover:from-gold-500 hover:to-gold-600 hover:shadow-glow-gold-lg",
+        "active:scale-[0.98] transition-all duration-200",
         @class
       ]}
       {@rest}
@@ -310,7 +314,7 @@ defmodule Web.CoreComponents do
 
     ~H"""
     <div>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <label class="flex items-center gap-4 text-sm leading-6 text-gray-300">
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
           type="checkbox"
@@ -318,7 +322,7 @@ defmodule Web.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
+          class="rounded border-dark-500 bg-dark-700 text-gold-500 focus:ring-gold-600/30 focus:ring-offset-0"
           {@rest}
         />
         <%= @label %>
@@ -335,7 +339,7 @@ defmodule Web.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class="rpg-select mt-2 block w-full"
         multiple={@multiple}
         {@rest}
       >
@@ -355,9 +359,8 @@ defmodule Web.CoreComponents do
         id={@id}
         name={@name}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          "rpg-input mt-2 min-h-[6rem]",
+          @errors != [] && "border-crimson-500/60 focus:border-crimson-500/60"
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
@@ -377,9 +380,8 @@ defmodule Web.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          "rpg-input mt-2",
+          @errors != [] && "border-crimson-500/60 focus:border-crimson-500/60"
         ]}
         {@rest}
       />
@@ -396,7 +398,7 @@ defmodule Web.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class="rpg-label">
       <%= render_slot(@inner_block) %>
     </label>
     """
@@ -409,7 +411,7 @@ defmodule Web.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
+    <p class="mt-3 flex gap-3 text-sm leading-6 text-crimson-400">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>
@@ -429,10 +431,10 @@ defmodule Web.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="rpg-title text-lg leading-8">
           <%= render_slot(@inner_block) %>
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-gray-400">
           <%= render_slot(@subtitle) %>
         </p>
       </div>
@@ -475,9 +477,9 @@ defmodule Web.CoreComponents do
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full">
-        <thead class="text-sm text-left leading-6 text-zinc-500">
+        <thead class="text-sm text-left leading-6 text-gray-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal font-display tracking-wide"><%= col[:label] %></th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only"><%= gettext("Actions") %></span>
             </th>
@@ -486,27 +488,27 @@ defmodule Web.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          class="relative divide-y divide-dark-600/50 border-t border-dark-600/50 text-sm leading-6 text-gray-300"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
+          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-dark-700/50">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-4 pr-6">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-dark-700/30 sm:rounded-l-xl" />
+                <span class={["relative", i == 0 && "font-semibold text-gray-100"]}>
                   <%= render_slot(col, @row_item.(row)) %>
                 </span>
               </div>
             </td>
             <td :if={@action != []} class="relative w-14 p-0">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
+                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-dark-700/30 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
-                  class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  class="relative ml-4 font-semibold leading-6 text-gold-400 hover:text-gold-300"
                 >
                   <%= render_slot(action, @row_item.(row)) %>
                 </span>
@@ -536,10 +538,10 @@ defmodule Web.CoreComponents do
   def list(assigns) do
     ~H"""
     <div class="mt-14">
-      <dl class="-my-4 divide-y divide-zinc-100">
+      <dl class="-my-4 divide-y divide-dark-600/50">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500"><%= item.title %></dt>
-          <dd class="text-zinc-700"><%= render_slot(item) %></dd>
+          <dt class="w-1/4 flex-none text-gray-500 font-display tracking-wide"><%= item.title %></dt>
+          <dd class="text-gray-300"><%= render_slot(item) %></dd>
         </div>
       </dl>
     </div>
@@ -561,7 +563,7 @@ defmodule Web.CoreComponents do
     <div class="mt-16">
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 text-gold-400 hover:text-gold-300 font-display tracking-wide"
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         <%= render_slot(@inner_block) %>

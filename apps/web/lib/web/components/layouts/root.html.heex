@@ -4,14 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Web" %>
+    <.live_title suffix=" · Elixir Quest">
+      <%= assigns[:page_title] || "Elixir Quest" %>
     </.live_title>
+    <!-- Google Fonts: Cinzel (display/headings) + Inter (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="h-full flex flex-col">
+  <body class="h-full flex flex-col bg-dark-950 text-gray-200 font-body antialiased">
     <%= @inner_content %>
   </body>
 </html>

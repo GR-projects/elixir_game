@@ -74,6 +74,7 @@ defmodule Web.CharacterController do
         end
     end
   end
+
   # def edit(conn, %{"id" => id}) do
   #   # TODO: Implement character editing
   # end

@@ -1,225 +1,189 @@
-<!-- Main navigation container -->
-<nav class="flex-no-wrap relative flex w-full items-center justify-between bg-zinc-50 py-2 shadow-dark-mild dark:bg-neutral-700 lg:flex-wrap lg:justify-start lg:py-4">
-  <div class="flex w-full flex-wrap items-center justify-between px-3">
-    <!-- Hamburger button for mobile view -->
-    <button
-      class="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
-      type="button"
-      data-twe-collapse-init
-      data-twe-target="#navbarSupportedContent1"
-      aria-controls="navbarSupportedContent1"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <!-- Hamburger icon -->
-      <span class="[&>svg]:w-7 [&>svg]:stroke-black/50 dark:[&>svg]:stroke-neutral-200">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            fill-rule="evenodd"
-            d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </span>
-    </button>
-    <!-- Collapsible navigation container -->
-    <div
-      class="!visible hidden flex-grow basis-[100%] items-center lg:!flex lg:basis-auto"
-      id="navbarSupportedContent1"
-      data-twe-collapse-item
-    >
-      <!-- Left navigation links -->
-      <ul class="list-style-none me-auto flex flex-col ps-0 lg:flex-row" data-twe-navbar-nav-ref>
-        <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-          <!-- Home link -->
-          <a
-            class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-            href="#"
-            data-twe-nav-link-ref
-          >
-            Home
-          </a>
-        </li>
-        <!-- Battle link -->
-        <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-          <a
-            class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-            href="#"
-            data-twe-nav-link-ref
-          >
-            Battle
-          </a>
-        </li>
-        <!-- Map link -->
-        <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-          <a
-            class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-            href="#"
-            data-twe-nav-link-ref
-          >
-            Map
-          </a>
-        </li>
-        <!-- Missions link -->
-        <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-          <a
-            class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-            href="#"
-            data-twe-nav-link-ref
-          >
-            Missions
-          </a>
-        </li>
-        <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-          <a
-            class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-            href={~p"/equipment"}
-            data-twe-nav-link-ref
-          >
-            Equipment
-          </a>
-        </li>
-            <!-- Character link -->
-            <li class="mb-4 lg:mb-0 lg:pe-2" data-twe-nav-item-ref>
-            <a
-                class="text-black/60 transition duration-200 hover:text-black/80 hover:ease-in-out focus:text-black/80 active:text-black/80 motion-reduce:transition-none dark:text-white/60 dark:hover:text-white/80 dark:focus:text-white/80 dark:active:text-white/80 lg:px-2"
-                href={~p"/character"}
-                data-twe-nav-link-ref
-                >Character</a>
-            </li>
-      </ul>
-      <!-- Left links -->
-    </div>
-    <!-- Right elements -->
-    <div class="relative flex items-center">
-      <!-- First dropdown container -->
-      <div class="relative" data-twe-dropdown-ref data-twe-dropdown-alignment="end">
-        <!-- First dropdown trigger -->
-        <a
-          class="me-4 flex items-center text-neutral-600 dark:text-white"
-          href="#"
-          id="dropdownMenuButton1"
-          role="button"
-          data-twe-dropdown-toggle-ref
-          aria-expanded="false"
-        >
-          <!-- Dropdown trigger icon -->
-          <span class="[&>svg]:w-5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
-                clip-rule="evenodd"
-              />
+<!-- Main navigation -->
+<nav class="relative z-50 border-b border-gold-700/20 bg-dark-900/90 backdrop-blur-md">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+      <!-- Left: Logo + nav links -->
+      <div class="flex items-center gap-8">
+        <!-- Game logo/brand -->
+        <a href={~p"/"} class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-500 to-gold-700 flex items-center justify-center shadow-glow-gold group-hover:shadow-glow-gold-lg transition-shadow duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-dark-950">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </span>
-          <!-- Notification counter -->
-          <span class="absolute -mt-4 ms-2.5 rounded-full bg-danger px-[0.35em] py-[0.15em] text-[0.6rem] font-bold leading-none text-white">
-            1
+          </div>
+          <span class="font-display text-lg font-bold tracking-wider text-gold-400 group-hover:text-gold-300 transition-colors hidden sm:block">
+            Elixir Quest
           </span>
         </a>
-        <!-- First dropdown menu -->
-        <ul
-          class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg data-[twe-dropdown-show]:block dark:bg-surface-dark"
-          aria-labelledby="dropdownMenuButton1"
-          data-twe-dropdown-menu-ref
-        >
-          <!-- First dropdown menu items -->
-          <li>
-            <a
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href="#"
-              data-twe-dropdown-item-ref
-            >
-              Action
-            </a>
-          </li>
-          <li>
-            <a
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href="#"
-              data-twe-dropdown-item-ref
-            >
-              Another action
-            </a>
-          </li>
-          <li>
-            <a
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href="#"
-              data-twe-dropdown-item-ref
-            >
-              Something else here
-            </a>
-          </li>
-        </ul>
+
+        <!-- Desktop nav links -->
+        <div class="hidden lg:flex items-center gap-1">
+          <a href={~p"/"} class="rpg-nav-link">Home</a>
+          <a href="#" class="rpg-nav-link">Battle</a>
+          <a href="#" class="rpg-nav-link">Map</a>
+          <a href="#" class="rpg-nav-link">Missions</a>
+          <a href={~p"/equipment"} class="rpg-nav-link">Equipment</a>
+          <a href={~p"/character"} class="rpg-nav-link">Character</a>
+        </div>
       </div>
-      <!-- Second dropdown container -->
-      <div class="relative" data-twe-dropdown-ref data-twe-dropdown-alignment="end">
-        <!-- Second dropdown trigger -->
-        <a
-          class="flex items-center whitespace-nowrap transition duration-150 ease-in-out motion-reduce:transition-none"
-          href="#"
-          id="dropdownMenuButton2"
-          role="button"
-          data-twe-dropdown-toggle-ref
+
+      <!-- Right: notifications + user menu -->
+      <div class="flex items-center gap-4">
+        <!-- Notification bell -->
+        <div class="relative" data-twe-dropdown-ref data-twe-dropdown-alignment="end">
+          <button
+            class="relative p-2 rounded-lg text-gray-400 hover:text-gold-400 hover:bg-dark-700/50 transition-all duration-200"
+            id="dropdownMenuButton1"
+            role="button"
+            data-twe-dropdown-toggle-ref
+            aria-expanded="false"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z" clip-rule="evenodd" />
+            </svg>
+            <span class="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-crimson-500 text-[0.6rem] font-bold text-white ring-2 ring-dark-900">
+              1
+            </span>
+          </button>
+          <ul
+            class="absolute z-[1000] float-left m-0 mt-2 hidden min-w-[200px] list-none overflow-hidden rounded-xl border border-gold-700/20 bg-dark-800/95 backdrop-blur-md text-sm shadow-xl data-[twe-dropdown-show]:block"
+            aria-labelledby="dropdownMenuButton1"
+            data-twe-dropdown-menu-ref
+          >
+            <li>
+              <a class="block px-4 py-2.5 text-gray-300 hover:bg-dark-700/80 hover:text-gold-400 transition-colors" href="#" data-twe-dropdown-item-ref>
+                Action
+              </a>
+            </li>
+            <li>
+              <a class="block px-4 py-2.5 text-gray-300 hover:bg-dark-700/80 hover:text-gold-400 transition-colors" href="#" data-twe-dropdown-item-ref>
+                Another action
+              </a>
+            </li>
+            <li>
+              <a class="block px-4 py-2.5 text-gray-300 hover:bg-dark-700/80 hover:text-gold-400 transition-colors" href="#" data-twe-dropdown-item-ref>
+                Something else here
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- User avatar dropdown -->
+        <div class="relative" data-twe-dropdown-ref data-twe-dropdown-alignment="end">
+          <button
+            class="flex items-center gap-2 p-1 rounded-lg hover:bg-dark-700/50 transition-all duration-200"
+            id="dropdownMenuButton2"
+            role="button"
+            data-twe-dropdown-toggle-ref
+            aria-expanded="false"
+          >
+            <div class="w-8 h-8 rounded-full ring-2 ring-gold-700/30 overflow-hidden">
+              <img
+                src="/images/user_logo_compressed.png"
+                class="w-full h-full object-cover"
+                alt="User avatar"
+                loading="lazy"
+              />
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-gray-500 hidden sm:block">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <ul
+            class="absolute z-[1000] float-left m-0 mt-2 hidden min-w-[180px] list-none overflow-hidden rounded-xl border border-gold-700/20 bg-dark-800/95 backdrop-blur-md text-sm shadow-xl data-[twe-dropdown-show]:block"
+            aria-labelledby="dropdownMenuButton2"
+            data-twe-dropdown-menu-ref
+          >
+            <li>
+              <a class="block px-4 py-2.5 text-gray-300 hover:bg-dark-700/80 hover:text-gold-400 transition-colors" href={~p"/showMe"} data-twe-dropdown-item-ref>
+                <span class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-gray-500">
+                    <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+                  </svg>
+                  Profile
+                </span>
+              </a>
+            </li>
+            <li>
+              <a class="block px-4 py-2.5 text-gray-300 hover:bg-dark-700/80 hover:text-gold-400 transition-colors" href="#" data-twe-dropdown-item-ref>
+                <span class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-gray-500">
+                    <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                  </svg>
+                  Settings
+                </span>
+              </a>
+            </li>
+            <li class="border-t border-dark-600/50">
+              <.link
+                class="block px-4 py-2.5 text-crimson-400 hover:bg-crimson-900/20 hover:text-crimson-300 transition-colors"
+                href={~p"/logout"}
+                method={:post}
+                data-confirm="Are you sure?"
+                data-twe-dropdown-item-ref
+              >
+                <span class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                    <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l1.048-.943a.75.75 0 10-1.004-1.114l-2.5 2.25a.75.75 0 000 1.114l2.5 2.25a.75.75 0 101.004-1.114l-1.048-.943h9.546A.75.75 0 0019 10z" clip-rule="evenodd" />
+                  </svg>
+                  Logout
+                </span>
+              </.link>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button
+          class="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gold-400 hover:bg-dark-700/50 transition-all"
+          type="button"
+          data-twe-collapse-init
+          data-twe-target="#navbarMobile"
+          aria-controls="navbarMobile"
           aria-expanded="false"
+          aria-label="Toggle navigation"
         >
-          <!-- User avatar -->
-          <img
-            src="/images/user_logo_compressed.png"
-            class="rounded-full"
-            style="height: 25px; width: 25px"
-            alt=""
-            loading="lazy"
-          />
-        </a>
-        <!-- Second dropdown menu -->
-        <ul
-          class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg data-[twe-dropdown-show]:block dark:bg-surface-dark"
-          aria-labelledby="dropdownMenuButton2"
-          data-twe-dropdown-menu-ref
-        >
-          <!-- Second dropdown menu items -->
-          <li>
-            <a
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href="#"
-              data-twe-dropdown-item-ref
-            >
-              Profile
-            </a>
-          </li>
-          <li>
-            <a
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href="#"
-              data-twe-dropdown-item-ref
-            >
-              Settings
-            </a>
-          </li>
-          <li>
-            <.link
-              class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-              href={~p"/logout"}
-              method={:post}
-              data-confirm="Are you sure?"
-              data-twe-dropdown-item-ref
-            >
-              Logout
-            </.link>
-          </li>
-        </ul>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+            <path fill-rule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+          </svg>
+        </button>
       </div>
     </div>
-    <!-- Right elements -->
+
+    <!-- Mobile nav menu -->
+    <div class="!visible hidden lg:!hidden border-t border-dark-600/50" id="navbarMobile" data-twe-collapse-item>
+      <div class="space-y-1 px-2 py-3">
+        <a href={~p"/"} class="block rpg-nav-link">Home</a>
+        <a href="#" class="block rpg-nav-link">Battle</a>
+        <a href="#" class="block rpg-nav-link">Map</a>
+        <a href="#" class="block rpg-nav-link">Missions</a>
+        <a href={~p"/equipment"} class="block rpg-nav-link">Equipment</a>
+        <a href={~p"/character"} class="block rpg-nav-link">Character</a>
+      </div>
+    </div>
   </div>
 </nav>
 
-<main class="flex-grow px-4 py-20 sm:px-6 lg:px-8 bg-gray-500">
-  <div class="mx-auto">
+<!-- Main content -->
+<main class="flex-grow relative">
+  <!-- Subtle ambient background -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-arcane-600/[0.02] rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/[0.02] rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <.flash_group flash={@flash} />
     <%= @inner_content %>
   </div>
 </main>
+
+<!-- Footer -->
+<footer class="border-t border-dark-700/30 bg-dark-900/50 py-4">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <p class="text-center text-xs text-gray-600 font-display tracking-wider">
+      Elixir Quest &mdash; Forged with Phoenix
+    </p>
+  </div>
+</footer>
