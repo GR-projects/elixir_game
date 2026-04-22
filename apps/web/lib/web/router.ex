@@ -1,5 +1,6 @@
 defmodule Web.Router do
   use Web, :router
+  alias Utils.ETS
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -23,25 +24,25 @@ defmodule Web.Router do
   end
 
   defp ensure_authorized(conn, _opts) do
-    case get_session(conn, :user) do
-      nil ->
+    with user_id when not is_nil(user_id) <- get_session(conn, :user_id),
+         {:ok, user} <- Utils.ETS.lookup(:users, user_id) do
+      conn
+      |> assign(:user, user)
+    else
+      _ ->
         redirect(conn, to: "/login")
-
-      user ->
-        conn
-        |> assign(:user, user)
     end
   end
 
   defp ensure_unauthorized(conn, _opts) do
-    case get_session(conn, :user) do
-      nil ->
+    with user_id when not is_nil(user_id) <- get_session(conn, :user_id),
+         {:ok, user} <- Utils.ETS.lookup(:users, user_id) do
+      conn
+      |> assign(:user, user)
+      |> redirect(to: "/")
+    else
+      _ ->
         conn
-
-      user ->
-        conn
-        |> assign(:user, user)
-        |> redirect(to: "/")
     end
   end
 
@@ -69,8 +70,12 @@ defmodule Web.Router do
     pipe_through [:browser, :unauth]
     post "/register", AuthController, :register
     get "/register", AuthController, :register_page
+    get "/registration-sent", AuthController, :registration_sent
     get "/login", AuthController, :login_page
     post "/login", AuthController, :login
+    get "/confirm/:token", AuthController, :confirm
+    get "/resend-confirmation", AuthController, :resend_confirmation_page
+    post "/resend-confirmation", AuthController, :resend_confirmation
   end
 
   # Other scopes may use custom stacks.

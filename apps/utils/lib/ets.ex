@@ -10,19 +10,29 @@ defmodule Utils.ETS do
   """
   @spec init([atom()] | nil) :: :ok
   def init(tables \\ nil) do
-    tables = tables || Application.get_env(:utils, Utils.ETS)[:tables] || []
-    |> dbg()
+    tables =
+      tables || Application.get_env(:utils, Utils.ETS)[:tables] ||
+        []
+        |> dbg()
+
     Enum.each(tables, fn table_name ->
-      :ets.new(table_name, [:named_table, :set, :public, read_concurrency: true, write_concurrency: true])
+      :ets.new(table_name, [
+        :named_table,
+        :set,
+        :public,
+        read_concurrency: true,
+        write_concurrency: true
+      ])
     end)
   end
 
   @doc """
   Inserts a tuple into the specified ETS table.
   """
-  @spec insert(atom(), tuple()) :: true
+  @spec insert(atom(), tuple()) :: :ok
   def insert(table_name, tuple) do
     :ets.insert(table_name, tuple)
+    :ok
   end
 
   @doc """
@@ -34,6 +44,7 @@ defmodule Utils.ETS do
     case :ets.lookup(table_name, key) do
       [{_key, value}] ->
         {:ok, value}
+
       [] ->
         {:error, :not_found}
     end

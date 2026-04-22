@@ -59,6 +59,8 @@ defmodule Web.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"},
+      {:swoosh, "~> 1.5"},
+      {:hackney, "~> 1.17"},
       {:utils, in_umbrella: true}
     ]
   end

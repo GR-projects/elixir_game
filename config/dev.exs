@@ -1,5 +1,7 @@
 import Config
 
+config :web, Web.Mailer, adapter: Swoosh.Adapters.Local
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -54,3 +56,5 @@ config :web, Web.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :web, dev_routes: true
+
+config :web, :base_url, System.get_env("BASE_URL", "http://localhost:4000")

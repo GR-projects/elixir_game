@@ -17,6 +17,20 @@ defmodule Data do
     end
   end
 
+  @spec update_user(User.t(), map()) :: {:ok, User.t()} | {:error, list()}
+  def update_user(user, params) do
+    changeset = User.changeset(user, params, required: [])
+
+    case Repo.update(changeset) do
+      {:ok, updated_user} ->
+        ETS.delete(:users, user.login)
+        {:ok, updated_user}
+
+      {:error, changeset} ->
+        {:error, changeset.errors}
+    end
+  end
+
   @spec get_user(String.t()) :: User.t()
   def get_user(login) do
     case ETS.lookup(:users, login) do
@@ -153,6 +167,18 @@ defmodule Data do
         end
 
         result
+    end
+  end
+
+  @spec delete_user(integer()) :: {:ok, User.t()} | {:error, list()}
+  def delete_user(id) do
+    case Repo.get(User, id) do
+      nil ->
+        {:error, :not_found}
+
+      user ->
+        ETS.delete(:users, user.login)
+        Repo.delete(user)
     end
   end
 

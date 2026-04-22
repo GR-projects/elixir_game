@@ -21,8 +21,7 @@ config :data, Data.Repo,
 
 config :data, :ecto_repos, [Data.Repo]
 
-config :utils, Utils.ETS,
-  tables: [:users]
+config :utils, Utils.ETS, tables: [:users]
 
 # Configures the endpoint
 config :web, Web.Endpoint,
@@ -33,7 +32,8 @@ config :web, Web.Endpoint,
     layout: false
   ],
   pubsub_server: Web.PubSub,
-  live_view: [signing_salt: "nSwI7/Do"]
+  live_view: [signing_salt: "nSwI7/Do"],
+  filter_parameters: ["password"]
 
 # Configure esbuild (the version is required)
 config :esbuild,

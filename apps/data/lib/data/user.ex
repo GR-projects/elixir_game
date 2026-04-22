@@ -9,22 +9,22 @@ defmodule Data.User do
     field(:email, :string)
     field(:password_hash, :string)
     field(:login, :string)
+    field(:confirmed_at, :utc_datetime)
     has_many(:characters, Data.Character)
 
-    # Automatically adds inserted_at and updated_at
     timestamps()
   end
 
   @spec changeset(map()) :: Ecto.Changeset.t()
   def changeset(params), do: changeset(%__MODULE__{}, params)
 
-  def changeset(user, attrs) do
+  def changeset(user, attrs, opts \\ []) do
+    required = Keyword.get(opts, :required, [:name, :email, :password_hash, :login])
+
     user
-    |> cast(attrs, [:name, :email, :password_hash, :login])
-    |> validate_required([:name, :email, :password_hash, :login])
-    # Example validation: login should be at least 3 characters long
+    |> cast(attrs, [:name, :email, :password_hash, :login, :confirmed_at])
+    |> validate_required(required)
     |> validate_length(:login, min: 3)
-    # Ensure the email and name are unique
     |> unique_constraint(:email)
     |> unique_constraint(:name)
   end

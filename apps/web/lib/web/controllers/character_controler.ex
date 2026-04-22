@@ -1,14 +1,24 @@
 defmodule Web.CharacterController do
   use Web, :controller
   alias Web.Messages
+  alias Utils.ETS
+
+  defp get_user_from_session(conn) do
+    with user_id when not is_nil(user_id) <- get_session(conn, :user_id),
+         {:ok, user} <- ETS.lookup(:users, user_id) do
+      {:ok, user}
+    else
+      _ -> nil
+    end
+  end
 
   def index(conn, _params) do
-    case get_session(conn, :user) do
+    case get_user_from_session(conn) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
-      user ->
+      {:ok, user} ->
         changeset = BusinessLogic.character_changeset()
 
         conn
@@ -18,12 +28,12 @@ defmodule Web.CharacterController do
   end
 
   def new(conn, _params) do
-    case get_session(conn, :user) do
+    case get_user_from_session(conn) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
-      user ->
+      {:ok, user} ->
         changeset = BusinessLogic.character_changeset()
 
         conn
@@ -33,12 +43,12 @@ defmodule Web.CharacterController do
   end
 
   def create(conn, %{"character" => params}) do
-    case get_session(conn, :user) do
+    case get_user_from_session(conn) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
-      user ->
+      {:ok, user} ->
         case BusinessLogic.create_character(user, params) do
           {:ok, _character} ->
             conn
@@ -54,12 +64,12 @@ defmodule Web.CharacterController do
   end
 
   def show(conn, %{"id" => id}) do
-    case get_session(conn, :user) do
+    case get_user_from_session(conn) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
-      user ->
+      {:ok, user} ->
         case BusinessLogic.get_character(id) do
           {:ok, character} ->
             conn
@@ -84,12 +94,12 @@ defmodule Web.CharacterController do
   # end
 
   def delete(conn, %{"id" => id}) do
-    case get_session(conn, :user) do
+    case get_user_from_session(conn) do
       nil ->
         changeset = BusinessLogic.user_changeset()
         render(conn, :login, layout: false, changeset: changeset)
 
-      user ->
+      {:ok, user} ->
         case BusinessLogic.delete_character(id) do
           {:ok, _character} ->
             conn
@@ -99,7 +109,7 @@ defmodule Web.CharacterController do
           {:error, _error} ->
             conn
             |> assign(:user, user)
-            |> put_flash(:error, Messages.character_get_failure())
+            |> put_flash(:error, Messages.character_delete_failure())
             |> redirect(to: ~p"/character")
         end
     end

@@ -1,13 +1,17 @@
 import Config
 
-if config_env() == :prod do
-  import Config
+if config_env() == :dev do
+  config :business_logic,
+    confirmation_secret_key:
+      System.get_env("CONFIRMATION_SECRET_KEY") || "dev_key_at_least_64_chars_abcdef"
+end
 
-  # The secret key base is used to sign/encrypt cookies and other secrets.
-  # A default value is used in config/dev.exs and config/test.exs but you
-  # want to use a different value for prod and you most likely don't want
-  # to check this value into version control, so we use an environment
-  # variable instead.
+if config_env() == :prod do
+  config :business_logic,
+    confirmation_secret_key:
+      System.get_env("CONFIRMATION_SECRET_KEY") ||
+        raise("CONFIRMATION_SECRET_KEY environment variable is missing")
+
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
       raise """
