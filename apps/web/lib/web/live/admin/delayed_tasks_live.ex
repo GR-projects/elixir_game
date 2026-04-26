@@ -7,25 +7,20 @@ defmodule Web.Admin.DelayedTasksLive do
 
   @impl true
   def mount(_params, session, socket) do
-    user = session["user"]
+    user_id = session["user_id"]
+    user = Data.get_user_by_id(user_id)
 
     if user do
-      db_user = Data.get_user(user.login)
+      schedule_refresh()
 
-      if db_user && db_user.role == "admin" do
-        schedule_refresh()
-
-        {:ok,
-         assign(socket,
-           user: db_user,
-           tasks: list_recent_tasks(),
-           refresh_interval: @refresh_interval
-         )}
-      else
-        {:ok, put_flash(socket, :error, "Access denied. Admin only.")}
-      end
+      {:ok,
+       assign(socket,
+         user: user,
+         tasks: list_recent_tasks(),
+         refresh_interval: @refresh_interval
+       )}
     else
-      {:ok, put_flash(socket, :error, "Access denied. Admin only.")}
+      {:ok, put_flash(socket, :error, "Access denied.")}
     end
   end
 
@@ -81,9 +76,9 @@ defmodule Web.Admin.DelayedTasksLive do
     |> NaiveDateTime.to_string()
   end
 
-  defp state_class("scheduled"), do: "px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs"
-  defp state_class("processing"), do: "px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
-  defp state_class("completed"), do: "px-2 py-1 bg-green-100 text-green-800 rounded text-xs"
-  defp state_class("failed"), do: "px-2 py-1 bg-red-100 text-red-800 rounded text-xs"
-  defp state_class(_), do: "px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs"
+  defp state_class("scheduled"), do: "px-2 py-1 rounded text-xs bg-yellow-900/30 text-yellow-400"
+  defp state_class("processing"), do: "px-2 py-1 rounded text-xs bg-blue-900/30 text-blue-400"
+  defp state_class("completed"), do: "px-2 py-1 rounded text-xs bg-green-900/30 text-green-400"
+  defp state_class("failed"), do: "px-2 py-1 rounded text-xs bg-crimson-900/30 text-crimson-400"
+  defp state_class(_), do: "px-2 py-1 rounded text-xs bg-dark-600/30 text-gray-400"
 end

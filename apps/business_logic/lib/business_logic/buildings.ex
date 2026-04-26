@@ -42,6 +42,18 @@ defmodule BusinessLogic.Buildings do
     Data.get_character_building(character_id, type)
   end
 
+  def get_pending_building_tasks(character_id) do
+    Data.DelayedTasks.list_pending_building_tasks(character_id)
+    |> Enum.map(fn task ->
+      type = task.params["building_type"]
+      level = task.params["level"]
+      state = task.state
+      execute_at = DateTime.to_unix(task.execute_at)
+      {type, level, state, execute_at}
+    end)
+    |> Enum.reject(fn p -> p == {} end)
+  end
+
   def start_building(character_id, type) when is_atom(type) do
     case get_building_info(type) do
       nil ->

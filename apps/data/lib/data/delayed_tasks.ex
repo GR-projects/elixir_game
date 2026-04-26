@@ -154,4 +154,18 @@ defmodule Data.DelayedTasks do
     )
     |> Repo.all()
   end
+
+  @doc """
+  Lists pending building tasks for a character.
+  """
+  @spec list_pending_building_tasks(integer()) :: [DelayedTask.t()]
+  def list_pending_building_tasks(character_id) do
+    from(t in DelayedTask,
+      where: t.state in ["scheduled", "processing"],
+      where: fragment("(? ->> 'character_id')::int = ?", t.params, ^character_id),
+      where: fragment("(? ->> 'building_type')::text is not null", t.params),
+      order_by: [asc: t.execute_at]
+    )
+    |> Repo.all()
+  end
 end

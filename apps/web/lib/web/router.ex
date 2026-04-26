@@ -27,30 +27,25 @@ defmodule Web.Router do
   end
 
   defp ensure_authorized(conn, _opts) do
-    case get_session(conn, :user) do
+    case get_session(conn, :user_id) do
       nil ->
         redirect(conn, to: "/login")
 
-      user ->
-        conn
-        |> assign(:user, user)
+      user_id ->
+        db_user = Data.get_user_by_id(user_id)
+        if db_user do
+          assign(conn, :user, db_user)
+        else
+          redirect(conn, to: "/login")
+        end
     end
   end
 
   defp ensure_admin(conn, _opts) do
     user = conn.assigns[:user]
 
-    if user do
-      db_user = Data.get_user(user.login)
-
-      if db_user && db_user.role == "admin" do
-        assign(conn, :user, db_user)
-      else
-        conn
-        |> put_flash(:error, "Access denied. Admin only.")
-        |> redirect(to: "/")
-        |> halt()
-      end
+    if user && user.role == "admin" do
+      conn
     else
       conn
       |> put_flash(:error, "Access denied. Admin only.")

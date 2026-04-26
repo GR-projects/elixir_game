@@ -6,7 +6,7 @@ defmodule Web.AuthController do
     case BusinessLogic.create_user(params) do
       {:ok, user} ->
         conn
-        |> put_session(:user, user)
+        |> put_session(:user_id, user.id)
         |> put_flash(:info, Messages.user_registration_success())
         |> redirect(to: ~p"/")
 
@@ -19,7 +19,7 @@ defmodule Web.AuthController do
 
   def logout(conn, _params) do
     conn
-    |> delete_session(:user)
+    |> delete_session(:user_id)
     |> redirect(to: ~p"/login")
   end
 
@@ -27,7 +27,7 @@ defmodule Web.AuthController do
     case BusinessLogic.authenticate_user(params) do
       {:ok, user} ->
         conn
-        |> put_session(:user, user)
+        |> put_session(:user_id, user.id)
         |> put_flash(:info, Messages.user_login_success())
         |> redirect(to: ~p"/")
 
@@ -41,8 +41,12 @@ defmodule Web.AuthController do
   end
 
   def login_page(conn, _params) do
-    changeset = BusinessLogic.user_changeset()
-    render(conn, :login, layout: false, changeset: changeset)
+    if get_session(conn, :user_id) do
+      redirect(conn, to: ~p"/")
+    else
+      changeset = BusinessLogic.user_changeset()
+      render(conn, :login, layout: false, changeset: changeset)
+    end
   end
 
   def show(conn, _params) do
@@ -50,13 +54,13 @@ defmodule Web.AuthController do
   end
 
   def register_page(conn, _params) do
-    case get_session(conn, :user) do
-      nil ->
-        changeset = BusinessLogic.user_changeset()
-        render(conn, :register, layout: false, changeset: changeset)
+    user_id = get_session(conn, :user_id)
 
-      _user ->
-        redirect(conn, to: ~p"/")
+    if user_id do
+      redirect(conn, to: ~p"/")
+    else
+      changeset = BusinessLogic.user_changeset()
+      render(conn, :register, layout: false, changeset: changeset)
     end
   end
 end

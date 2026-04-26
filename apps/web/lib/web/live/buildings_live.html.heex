@@ -1,78 +1,142 @@
-<h1>Buildings</h1>
-
-<%= if Enum.empty?(@characters) do %>
-  <p class="text-red-500">No character found. Please create one first.</p>
-<% else %>
-  <div class="mb-4">
-    <form phx-change="select_character">
-      <label for="character-select" class="font-bold mr-2">Select Character:</label>
-      <select id="character-select" name="character_id" class="border rounded px-2 py-1">
-        <%= for char <- @characters do %>
-          <option value={char.id} selected={char.id == @character_id}>
-            <%= char.name %> (Level <%= char.level %>)
-          </option>
-        <% end %>
-      </select>
-    </form>
-  </div>
-<% end %>
-
-<h2>Available Buildings</h2>
-
-<div class="grid grid-cols-2 gap-4">
-  <%= for {type, info} <- Buildings.building_types() do %>
-    <div class="border p-4 rounded">
-      <h3 class="text-lg font-bold"><%= info.name %></h3>
-      <p><%= info.description %></p>
-
-      <%= if character_building = Enum.find(@buildings, fn b -> b.type == type end) do %>
-        <p class="mt-2">Current Level: <%= character_building.level %></p>
-        <p>
-          Next level build time: <%= elem(
-            Buildings.calculate_build_time(type, character_building.level + 1),
-            1
-          ) %> seconds
-        </p>
-
-        <form phx-submit="start_building" class="mt-2">
-          <input type="hidden" name="type" value={type} />
-          <button
-            type="submit"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Upgrade to Level <%= character_building.level + 1 %>
-          </button>
-        </form>
-      <% else %>
-        <p class="mt-2 text-gray-500">Not built yet</p>
-        <p>Build time: <%= info.base_build_time %> seconds</p>
-
-        <form phx-submit="start_building" class="mt-2">
-          <input type="hidden" name="type" value={type} />
-          <button
-            type="submit"
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Build
-          </button>
-        </form>
-      <% end %>
+<!-- Buildings Page - Dark Fantasy RPG Theme -->
+<div class="rpg-bg-particles">
+  <div class="relative z-10">
+    <!-- Page header -->
+    <div class="text-center py-8">
+      <h1 class="font-display text-3xl md:text-4xl font-bold text-gold-400 tracking-wider mb-3 text-shadow-glow">
+        Buildings
+      </h1>
+      <p class="text-gray-400 text-sm max-w-lg mx-auto">
+        Construct and upgrade buildings to strengthen your kingdom.
+      </p>
+      <div class="rpg-divider max-w-xs mx-auto mt-4"></div>
     </div>
-  <% end %>
-</div>
 
-<h2 class="mt-8">Your Buildings</h2>
+    <%= if Enum.empty?(@characters) do %>
+      <div class="rpg-card p-8 text-center max-w-md mx-auto">
+        <div class="w-16 h-16 rounded-full bg-crimson-900/30 border border-crimson-700/30 flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-crimson-400">
+            <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.199 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75.75 0 000 1.5z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-semibold text-crimson-400 mb-2">No Character Found</h3>
+        <p class="text-gray-400 text-sm">Please create a character first to start building.</p>
+        <a href={~p"/character"} class="inline-block mt-4 rpg-btn-primary">
+          Create Character
+        </a>
+      </div>
+    <% else %>
+      <!-- Character selector -->
+      <div class="rpg-card p-4 max-w-md mx-auto mb-8">
+        <form phx-change="select_character" class="flex items-center gap-4">
+          <label for="character-select" class="text-gray-400 text-sm whitespace-nowrap">Select Character:</label>
+          <select
+            id="character-select"
+            name="character_id"
+            class="rpg-input flex-grow"
+          >
+            <%= for char <- @characters do %>
+              <option value={char.id} selected={char.id == @character_id}>
+                <%= char.name %> (Level <%= char.level %>)
+              </option>
+            <% end %>
+          </select>
+        </form>
+      </div>
 
-<%= if Enum.empty?(@buildings) do %>
-  <p class="text-gray-500">No buildings yet. Start building to see them here!</p>
-<% else %>
-  <ul>
-    <%= for building <- @buildings do %>
-      <li>
-        <%= building.type %> - Level <%= building.level %>
-      </li>
+      <!-- Available buildings grid -->
+      <h2 class="font-display text-xl font-semibold text-gold-400 text-center mb-6">
+        Available Buildings
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <%= for {type, info} <- Buildings.building_types() do %>
+          <% type_str = Atom.to_string(type) %>
+          <% character_building = Enum.find(@buildings, fn b -> is_list(b) && length(b) == 2 && hd(b) == type_str end) %>
+          <% pending_task = Enum.find(@pending_tasks, fn p -> is_list(p) && length(p) == 4 && hd(p) == type_str end) %>
+          <div class="rpg-card p-5 group transition-all duration-300 hover:-translate-y-0.5">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gold-900/30 border border-gold-700/20 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gold-400">
+                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+                    <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-display text-lg font-semibold text-gold-400"><%= info.name %></h3>
+                  <p class="text-xs text-gray-500"><%= info.description %></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-dark-600/30">
+              <div>
+                <%= if character_building do %>
+                  <p class="text-sm text-gray-400">
+                    Current Level: <span class="text-gold-400 font-semibold"><%= List.last(character_building) %></span>
+                  </p>
+                <%= else %>
+                  <p class="text-sm text-gray-500">Not built yet</p>
+                  <p class="text-xs text-gray-600">Build time: <%= info.base_build_time %> seconds</p>
+                <% end %>
+                <%= if pending_task do %>
+                  <% remaining = Enum.at(pending_task, 3) - @now %>
+                  <p class="text-xs text-arcane-400 mt-1">
+                    <%= if Enum.at(pending_task, 2) == "processing" do %>
+                      Building in progress...
+                    <% else %>
+                      Queued - Level <%= Enum.at(pending_task, 1) %> (<%= remaining %>s remaining)
+                    <% end %>
+                  </p>
+                <% end %>
+                <%= if !pending_task && character_building do %>
+                  <% next_level = List.last(character_building) + 1 %>
+                  <% info_map = Map.get(BusinessLogic.Buildings.building_types(), type) %>
+                  <% next_build_time = if(info_map, do: info_map.base_build_time + info_map.time_per_level * (next_level - 1), else: 0) %>
+                  <p class="text-xs text-gray-500">Next level: <%= next_build_time %> seconds</p>
+                <% end %>
+              </div>
+              <%= if pending_task do %>
+                <button type="button" class="rpg-btn-primary opacity-50 cursor-not-allowed" disabled>
+                  In Progress
+                </button>
+              <%= else %>
+                <form phx-submit="start_building">
+                  <input type="hidden" name="type" value={type_str} />
+                  <button type="submit" class="rpg-btn-primary">
+                    <%= if character_building, do: "Upgrade", else: "Build" %>
+                  </button>
+                </form>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Your buildings section -->
+      <h2 class="font-display text-xl font-semibold text-gold-400 text-center mb-6">
+        Your Buildings
+      </h2>
+
+      <%= if Enum.empty?(@buildings) do %>
+        <div class="rpg-card p-8 text-center max-w-md mx-auto">
+          <p class="text-gray-500">No buildings yet. Start building to see them here!</p>
+        </div>
+      <% else %>
+        <div class="rpg-card p-5 max-w-2xl mx-auto">
+          <ul class="space-y-3">
+            <%= for b <- @buildings do %>
+              <%= if b != [] do %>
+                <li class="flex items-center justify-between py-2 border-b border-dark-600/30 last:border-0">
+                  <span class="text-gold-400 font-medium"><%= hd(b) %></span>
+                  <span class="text-gray-500">Level <%= List.last(b) %></span>
+                </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
     <% end %>
-  </ul>
-<% end %>
-
-<p class="mt-4"><a href="/" class="text-blue-500 hover:underline">Back to Home</a></p>
+  </div>
+</div>

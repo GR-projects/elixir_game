@@ -39,14 +39,14 @@ defmodule BusinessLogic do
     if user do
       case result do
         {:ok, character} ->
-          case Utils.ETS.lookup(:users, user.login) do
+          case Utils.ETS.lookup(:users, user.id) do
             {:ok, cached_user} ->
               updated_user =
                 Map.update!(cached_user, :characters, fn chars ->
                   Enum.reject(chars, &(&1.id == character.id))
                 end)
 
-              Utils.ETS.insert(:users, {user.login, updated_user})
+              Utils.ETS.insert(:users, {user.id, updated_user})
 
             {:error, :not_found} ->
               :ok
@@ -79,8 +79,8 @@ defmodule BusinessLogic do
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(user = %{id: user_id, login: login}) do
-    case Utils.ETS.lookup(:users, login) do
+  def get_user_items(user = %{id: user_id}) do
+    case Utils.ETS.lookup(:users, user_id) do
       {:ok, cached_user} ->
         characters = Map.get(cached_user, :characters, [])
 
@@ -99,7 +99,7 @@ defmodule BusinessLogic do
 
       {:error, :not_found} ->
         ets_user = user |> Data.Repo.preload(characters: :items)
-        Utils.ETS.insert(:users, {login, ets_user})
+        Utils.ETS.insert(:users, {user.id, ets_user})
 
         ets_user
         |> Map.get(:characters, [])
@@ -108,7 +108,7 @@ defmodule BusinessLogic do
   end
 
   def create_character(
-        user = %{id: user_id, login: login},
+        user = %{id: user_id},
         %{"type" => _type, "name" => _name} = params
       ) do
     result =
@@ -118,26 +118,8 @@ defmodule BusinessLogic do
       |> Map.put("user_id", user_id)
       |> Data.create_character()
 
-    case result do
-      {:ok, character} ->
-        case Utils.ETS.lookup(:users, login) do
-          {:ok, cached_user} ->
-            updated_user =
-              Map.update!(cached_user, :characters, fn chars -> [character | chars] end)
-
-            Utils.ETS.insert(:users, {login, updated_user})
-
-          {:error, :not_found} ->
-            :ok
-        end
-
-      {:error, _} ->
-        :ok
-    end
-
     result
   end
-
 
   def get_character(id) when is_integer(id) do
     Data.get_character(id)
@@ -146,9 +128,5 @@ defmodule BusinessLogic do
   def get_character(id) when is_binary(id) do
     # convert string id to integer for downstream Data.get_character/1
     Data.get_character(String.to_integer(id))
-  end
-
-  def delete_character(id) do
-    Data.delete_character(id)
   end
 end
