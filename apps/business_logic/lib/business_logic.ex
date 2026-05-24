@@ -24,9 +24,13 @@ defmodule BusinessLogic do
   @doc """
   Gets a character by ID.
   """
-  @spec get_character(integer()) :: map() | nil
-  def get_character(id) do
+  @spec get_character(integer() | String.t()) :: map() | nil
+  def get_character(id) when is_integer(id) do
     Data.get_character(id)
+  end
+
+  def get_character(id) when is_binary(id) do
+    Data.get_character(String.to_integer(id))
   end
 
   @doc """
@@ -90,7 +94,7 @@ defmodule BusinessLogic do
               %Ecto.Association.NotLoaded{} ->
                 Data.Repo.preload(char, :items)
 
-              items ->
+              _items ->
                 char
             end
           end)
@@ -108,7 +112,7 @@ defmodule BusinessLogic do
   end
 
   def create_character(
-        user = %{id: user_id},
+        %{id: user_id},
         %{"type" => _type, "name" => _name} = params
       ) do
     result =
@@ -121,12 +125,4 @@ defmodule BusinessLogic do
     result
   end
 
-  def get_character(id) when is_integer(id) do
-    Data.get_character(id)
-  end
-
-  def get_character(id) when is_binary(id) do
-    # convert string id to integer for downstream Data.get_character/1
-    Data.get_character(String.to_integer(id))
-  end
 end

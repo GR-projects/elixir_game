@@ -47,9 +47,6 @@ defmodule Data.DelayedTasks do
     Repo.delete(task)
   end
 
-  @doc """
-  Deletes a delayed task by ID.
-  """
   @spec delete_task(String.t()) ::
           {:ok, DelayedTask.t()} | {:error, :not_found | Ecto.Changeset.t()}
   def delete_task(id) when is_binary(id) do

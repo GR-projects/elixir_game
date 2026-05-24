@@ -22,7 +22,7 @@ config :data, Data.Repo,
 config :data, :ecto_repos, [Data.Repo]
 
 config :utils, Utils.ETS,
-  tables: [:users]
+  tables: [:users, :delayed_tasks]
 
 # Configures the endpoint
 config :web, Web.Endpoint,

@@ -2,12 +2,12 @@ defmodule BusinessLogic.Buildings.Handler do
   @behaviour DelayedTasks.HandlerBehaviour
 
   @impl true
-  def handle_task(%{
+  def handle_task(%DelayedTasks.Task{params: %{
         character_id: character_id,
         building_type: building_type,
         action: action,
         level: level
-      }) do
+      }}) do
     result =
       case action do
         :create ->

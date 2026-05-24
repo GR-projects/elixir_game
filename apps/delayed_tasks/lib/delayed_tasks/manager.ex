@@ -74,21 +74,7 @@ defmodule DelayedTasks.Manager do
         Application.get_env(:delayed_tasks, :batch_size, @default_batch_size)
       )
 
-    # Create ETS table for task storage if it doesn't exist
-    table =
-      case :ets.whereis(@table_name) do
-        :undefined ->
-          :ets.new(@table_name, [
-            :set,
-            :public,
-            :named_table,
-            read_concurrency: true,
-            write_concurrency: true
-          ])
-
-        existing_table ->
-          existing_table
-      end
+    table = @table_name
 
     # Schedule the first check
     timer_ref = Process.send_after(self(), :check_due_tasks, check_interval)
@@ -270,18 +256,18 @@ defmodule DelayedTasks.Manager do
   end
 
   # Executes a task synchronously and returns the result
-  defp execute_task_sync(%{type: type, params: params}) do
-    case Handler.get_handler(type) do
+  defp execute_task_sync(%Task{} = task) do
+    case Handler.get_handler(task.type) do
       {:ok, module} ->
         try do
-          module.handle_task(params)
+          module.handle_task(task)
         rescue
           error ->
             {:error, "Unexpected error: #{inspect(error)}"}
         end
 
       {:error, :not_found} ->
-        {:error, "No handler found for task type: #{inspect(type)}"}
+        {:error, "No handler found for task type: #{inspect(task.type)}"}
 
       error ->
         {:error, "Error getting handler: #{inspect(error)}"}
@@ -394,14 +380,6 @@ defmodule DelayedTasks.Manager do
   defp update_task_in_db(task) do
     if Application.get_env(:delayed_tasks, :persistence_enabled, true) do
       if Code.ensure_loaded?(Data.DelayedTasks) do
-        attrs = %{
-          state: Atom.to_string(task.state),
-          result: task.result,
-          error: task.error,
-          completed_at: task.completed_at,
-          attempts: task.attempts
-        }
-
         Data.DelayedTasks.update_task_state(task.id, Atom.to_string(task.state), task.result)
       end
     end

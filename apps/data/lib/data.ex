@@ -76,7 +76,7 @@ defmodule Data do
   end
 
 @spec get_user_characters(User.t()) :: [Character.t()]
-  def get_user_characters(user = %{id: user_id}) do
+  def get_user_characters(%{id: user_id}) do
     case ETS.lookup(:users, user_id) do
       {:ok, cached_user} ->
         cached_user.characters
