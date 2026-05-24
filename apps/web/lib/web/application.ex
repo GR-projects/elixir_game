@@ -11,6 +11,7 @@ defmodule Web.Application do
       Web.Telemetry,
       # Start a worker by calling: Web.Worker.start_link(arg)
       # {Web.Worker, arg},
+      {Phoenix.PubSub, name: Web.PubSub},
       # Start to serve requests, typically the last entry
       Web.Endpoint
     ]
