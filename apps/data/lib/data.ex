@@ -3,6 +3,7 @@ defmodule Data do
   alias Data.Repo
   alias Data.User
   alias Data.Character
+  alias Data.Building
   alias Utils.ETS
 
   import Ecto.Query
@@ -19,24 +20,37 @@ defmodule Data do
 
   @spec get_user(String.t()) :: User.t()
   def get_user(login) do
-    case ETS.lookup(:users, login) do
+    case Repo.get_by(User, login: login) do
+      nil ->
+        nil
+
+      user ->
+        ets_user =
+          user
+          |> Repo.preload(characters: [items: :stats])
+
+        ETS.insert(:users, {ets_user.id, ets_user})
+        ets_user
+    end
+  end
+
+  @spec get_user_by_id(integer()) :: User.t() | nil
+  def get_user_by_id(user_id) do
+    case ETS.lookup(:users, user_id) do
       {:ok, user} ->
         user
 
       {:error, :not_found} ->
-        user = Repo.get_by(User, login: login)
+        user = Repo.get(User, user_id)
 
         case user do
           nil ->
             nil
 
           user ->
-            ets_user =
-              user
-              |> Repo.preload(characters: [items: :stats])
-
-            ETS.insert(:users, {login, ets_user})
-            user
+            ets_user = Repo.preload(user, characters: [items: :stats])
+            ETS.insert(:users, {user_id, ets_user})
+            ets_user
         end
     end
   end
@@ -61,28 +75,33 @@ defmodule Data do
     end
   end
 
-  def get_user_characters(user = %{login: login}) do
-    case ETS.lookup(:users, login) do
-      {:ok, %{characters: characters}} ->
-        characters
+@spec get_user_characters(User.t()) :: [Character.t()]
+  def get_user_characters(%{id: user_id}) do
+    case ETS.lookup(:users, user_id) do
+      {:ok, cached_user} ->
+        cached_user.characters
 
       {:error, :not_found} ->
-        ets_user = user |> Repo.preload(characters: [items: :stats])
-        ETS.insert(:users, {login, ets_user})
-        ets_user.characters
+        case reload_user_cache(user_id) do
+          {:ok, ets_user} ->
+            ets_user.characters
+
+          _ ->
+            []
+        end
     end
   end
 
   @spec get_user_items(Data.User.t()) :: [map()]
-  def get_user_items(_user = %{login: login}) do
-    case ETS.lookup(:users, login) do
+  def get_user_items(_user = %{id: user_id}) do
+    case ETS.lookup(:users, user_id) do
       {:ok, cached_user} ->
         cached_user
         |> Map.get(:characters, [])
         |> Enum.flat_map(&Map.get(&1, :items, []))
 
       {:error, :not_found} ->
-        case reload_user_cache(login) do
+        case reload_user_cache(user_id) do
           {:ok, ets_user} ->
             ets_user
             |> Map.get(:characters, [])
@@ -107,7 +126,7 @@ defmodule Data do
 
           user ->
             ets_user = Repo.preload(user, characters: [items: :stats])
-            ETS.insert(:users, {user.login, ets_user})
+            ETS.insert(:users, {user.id, ets_user})
         end
 
         {:ok, character}
@@ -145,7 +164,7 @@ defmodule Data do
 
               user ->
                 ets_user = Repo.preload(user, characters: [items: :stats])
-                ETS.insert(:users, {user.login, ets_user})
+                ETS.insert(:users, {user.id, ets_user})
             end
 
           _ ->
@@ -156,30 +175,46 @@ defmodule Data do
     end
   end
 
-  # Reloads the user from DB and updates ETS cache (preloading characters -> items -> stats).
-  # Accepts either a user id (integer) or login (binary).
+  # Reload the user from DB and update ETS cache (preloading characters -> items -> stats).
   # Returns {:ok, ets_user} or {:error, :not_found}.
-  defp reload_user_cache(identifier) when is_integer(identifier) do
-    case Repo.get(User, identifier) do
+  defp reload_user_cache(user_id) when is_integer(user_id) do
+    case Repo.get(User, user_id) do
       nil ->
         {:error, :not_found}
 
       user ->
         ets_user = Repo.preload(user, characters: [items: :stats])
-        ETS.insert(:users, {user.login, ets_user})
+        ETS.insert(:users, {user.id, ets_user})
         {:ok, ets_user}
     end
   end
 
-  defp reload_user_cache(identifier) when is_binary(identifier) do
-    case Repo.get_by(User, login: identifier) do
-      nil ->
-        {:error, :not_found}
+  def get_character_buildings(character_id) do
+    Building
+    |> where([b], b.character_id == ^character_id)
+    |> Repo.all()
+  end
 
-      user ->
-        ets_user = Repo.preload(user, characters: [items: :stats])
-        ETS.insert(:users, {identifier, ets_user})
-        {:ok, ets_user}
-    end
+  def get_character_building(character_id, type) do
+    Building
+    |> where([b], b.character_id == ^character_id and b.type == ^type)
+    |> Repo.one()
+  end
+
+  @spec create_building(map()) :: {:ok, Building.t()} | {:error, Ecto.Changeset.t()}
+  def create_building(attrs) do
+    %Building{}
+    |> Building.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_building(%Building{} = building, attrs) do
+    building
+    |> Building.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_building(%Building{} = building) do
+    Repo.delete(building)
   end
 end

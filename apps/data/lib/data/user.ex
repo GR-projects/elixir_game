@@ -9,6 +9,7 @@ defmodule Data.User do
     field(:email, :string)
     field(:password_hash, :string)
     field(:login, :string)
+    field(:role, :string, default: "user")
     has_many(:characters, Data.Character)
 
     # Automatically adds inserted_at and updated_at
@@ -20,11 +21,10 @@ defmodule Data.User do
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :password_hash, :login])
+    |> cast(attrs, [:name, :email, :password_hash, :login, :role])
     |> validate_required([:name, :email, :password_hash, :login])
-    # Example validation: login should be at least 3 characters long
+    |> validate_inclusion(:role, ["user", "admin"])
     |> validate_length(:login, min: 3)
-    # Ensure the email and name are unique
     |> unique_constraint(:email)
     |> unique_constraint(:name)
   end
