@@ -36,7 +36,8 @@ defmodule BusinessLogic do
   @doc """
   Deletes a character by ID.
   """
-  @spec delete_character(integer(), map() | nil) :: :ok | {:error, String.t()}
+  @spec delete_character(integer(), map() | nil) ::
+          {:ok, Data.Character.t()} | {:error, String.t()}
   def delete_character(id, user \\ nil) do
     result = Data.delete_character(id)
 
@@ -124,5 +125,4 @@ defmodule BusinessLogic do
 
     result
   end
-
 end
